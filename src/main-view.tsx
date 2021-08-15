@@ -4,7 +4,12 @@ import { action } from 'mobx';
 import { observer } from "mobx-react-lite";
 import styled from '@emotion/styled';
 
-import { Store } from './store';
+import * as fileParser from './file-parser';
+import * as Store from './store/store';
+
+declare var TAGS_FILE: string;
+
+const parsedFileData = fileParser.parseFile(TAGS_FILE);
 
 const Wrapper = styled.div`
     /* padding: 2em;
@@ -29,7 +34,7 @@ const MediaList = styled.ul<{width: number; height: number}>`
     }
 `;
 
-const fetchFiles = async (store: Store) => {
+const fetchFiles = async (store: Store.Store) => {
     const files = await (await fetch('http://localhost:3060/files')).json();
 
     console.log(files);
@@ -41,12 +46,38 @@ const mediaConfig = {
     // width: 640,
     width: 480,
     height: 270,
-}
+};
 
-export const MainView: React.FunctionComponent<{store: Store}> = observer(({store}) => {
+export const TagsBlock: React.FC<{store: Store.Store; tags: Store.Tag[]}> = observer(({store, tags}) => {
+    return (
+        <div>
+            <ul>
+                {
+                    tags.map(tag => {
+                        return (
+                            <li key={tag.id}>
+                                <div>{tag.name}</div>
+
+                                {
+                                    tag.children.length > 0
+                                    &&
+                                    <TagsBlock store={store} tags={tag.children} />
+                                }
+                            </li>
+                        );
+                    })
+                }
+            </ul>
+        </div>
+    );
+});
+
+export const MainView: React.FC<{store: Store.Store}> = observer(({store}) => {
     const [loaded, setLoaded] = React.useState(false);
 
     React.useEffect(() => {
+        store.setTags(parsedFileData.tags);
+
         (async () => {
             await fetchFiles(store);
 
@@ -56,6 +87,8 @@ export const MainView: React.FunctionComponent<{store: Store}> = observer(({stor
 
     return (
         <Wrapper>
+            <TagsBlock store={store} tags={store.topLevelTags} />
+
             {
                 loaded
                 &&

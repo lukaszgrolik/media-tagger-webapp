@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { BrowserRouter, Link, NavLink, Route, Switch } from 'react-router-dom';
 
-import * as Store from './store';
+import * as Store from './store/store';
 import { MainView } from './main-view';
 
 const store = new Store.Store();
