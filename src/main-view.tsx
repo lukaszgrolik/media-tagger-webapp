@@ -4,12 +4,7 @@ import { action } from 'mobx';
 import { observer } from "mobx-react-lite";
 import styled from '@emotion/styled';
 
-import * as fileParser from './file-parser';
 import * as Store from './store/store';
-
-declare var TAGS_FILE: string;
-
-const parsedFileData = fileParser.parseFile(TAGS_FILE);
 
 const Wrapper = styled.div`
     /* padding: 2em;
@@ -39,7 +34,7 @@ const fetchFiles = async (store: Store.Store) => {
 
     console.log(files);
 
-    store.setFiles(files);
+    store.setFilePaths(files);
 };
 
 const mediaConfig = {
@@ -53,10 +48,10 @@ export const TagsBlock: React.FC<{store: Store.Store; tags: Store.Tag[]}> = obse
         <div>
             <ul>
                 {
-                    tags.map(tag => {
+                    tags.slice().sort((a, b) => a.name.localeCompare(b.name)).map(tag => {
                         return (
                             <li key={tag.id}>
-                                <div>{tag.name}</div>
+                                <div>{tag.name} ({tag.files.length} files)</div>
 
                                 {
                                     tag.children.length > 0
@@ -76,8 +71,6 @@ export const MainView: React.FC<{store: Store.Store}> = observer(({store}) => {
     const [loaded, setLoaded] = React.useState(false);
 
     React.useEffect(() => {
-        store.setTags(parsedFileData.tags);
-
         (async () => {
             await fetchFiles(store);
 
@@ -85,9 +78,28 @@ export const MainView: React.FC<{store: Store.Store}> = observer(({store}) => {
         })();
     }, []);
 
+    const taggedFiles = store.files.filter(f => f.tagsIds.length !== 0);
+    const nonTaggedFiles = store.files.filter(f => f.tagsIds.length === 0);
+    const filesWithDescription = store.files.filter(f => f.description);
+
     return (
         <Wrapper>
-            <TagsBlock store={store} tags={store.topLevelTags} />
+            <div>
+                <div>
+                    <ul>
+                        <li>all files: {store.files.length}</li>
+                        <li>files w tags: {taggedFiles.length} </li>
+                        <li>files with no tags: {nonTaggedFiles.length}</li>
+                        <li>files w desc: {filesWithDescription.length}</li>
+                    </ul>
+                </div>
+
+                <div>
+                    all tags: {store.tags.length}
+                </div>
+
+                <TagsBlock store={store} tags={store.topLevelTags} />
+            </div>
 
             {
                 loaded
@@ -95,7 +107,7 @@ export const MainView: React.FC<{store: Store.Store}> = observer(({store}) => {
                 <div>
                     <MediaList width={mediaConfig.width} height={mediaConfig.height}>
                         {
-                            store.files.slice(0, 10).map(file => {
+                            store.filePaths.slice(0, 10).map(file => {
                                 return (
                                     <li key={file}>
                                         <video

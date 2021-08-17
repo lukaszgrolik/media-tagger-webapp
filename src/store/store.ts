@@ -1,11 +1,21 @@
 import { action, computed, makeObservable, observable } from "mobx";
 
+import { File, FileCreateBody } from "./file";
+import { Tag, TagCreateBody } from "./tag";
+
+export * from './tag';
+export * from './file';
+
 export class Store {
-    readonly files: string[] = [];
+    readonly filePaths: string[] = [];
+
     readonly tags: Tag[] = [];
+    readonly files: File[] = [];
 
     constructor() {
         makeObservable(this, {
+            setFilePaths: action,
+
             files: observable,
             setFiles: action,
 
@@ -15,9 +25,9 @@ export class Store {
         });
     }
 
-    setFiles(files: string[]) {
-        this.files.length = 0;
-        this.files.push(...files);
+    setFilePaths(files: string[]) {
+        this.filePaths.length = 0;
+        this.filePaths.push(...files);
     }
 
     setTags(tags: TagCreateBody[]) {
@@ -28,44 +38,10 @@ export class Store {
     get topLevelTags() {
         return this.tags.filter(t => t.parentId === null);
     }
-}
 
-interface TagCreateBody {
-    id: number;
-    name: string;
-    parentId: number | null;
-}
-
-export class Tag {
-    readonly id: number;
-    name: string;
-    parentId: number | null;
-
-    constructor(readonly store: Store, tag: TagCreateBody) {
-        this.id = tag.id;
-        this.name = tag.name;
-        this.parentId = tag.parentId;
-
-        makeObservable(this, {
-            name: observable,
-            // setName: action,
-
-            parentId: observable,
-            // setParentId: action,
-            parent: computed,
-            children: computed,
-        });
-    }
-
-    // setName(name: string) {
-    //     this.name = name;
-    // }
-
-    get parent(): Tag | null {
-        return this.store.tags.find(t => t.id === this.parentId) || null;
-    }
-
-    get children() {
-        return this.store.tags.filter(t => t.parentId === this.id);
+    setFiles(tags: FileCreateBody[]) {
+        this.files.length = 0;
+        this.files.push(...tags.map(t => new File(this, t)))
     }
 }
+

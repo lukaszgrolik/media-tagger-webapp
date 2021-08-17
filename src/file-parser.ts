@@ -4,15 +4,18 @@ interface Tag {
     parentId: null | number;
 }
 
+interface File {
+    // folderPath: string;
+    // fileId: string;
+    path: string;
+    description: string;
+    // fav: boolean;
+    tagsIds: number[];
+}
+
 interface FileParserResult {
     tags: Tag[];
-    files: {
-        folderPath: string;
-        fileId: string;
-        description: string;
-        fav: boolean;
-        tagsIds: number[];
-    }[];
+    files: File[];
 }
 
 export const parseFile = (dataStr: string): FileParserResult => {
@@ -44,9 +47,34 @@ export const parseFile = (dataStr: string): FileParserResult => {
         const m = line.match(/^(\d{4}-\d{2}-\d{2}(.+)?) \| (\d{2,3}) \|(.+)?$/);
         if (!m) throw new Error(`invalid line: ${line}`);
 
-        const [_a, folderPath, _b, fileId, tagStr] = m;
+        const [_a, folderPath, _b, fileId, restStr] = m;
+        const getFilePath = () => {
+            // file name format: MOV_0023.mp4
+            const fileNumber = `${new Array(4 - fileId.length).fill('0').join('')}${fileId}`;
 
-        if (tagStr) {
+            return `/${folderPath}/MOV_${fileNumber}.mp4`;
+        };
+        const file: File = {
+            path: getFilePath(),
+            description: '',
+            // fav: false,
+            tagsIds: [],
+        };
+
+        if (restStr) {
+            const [tagStr, descStr] = (() => {
+                const restM = restStr.match(/#\{opis\}(.+)$/);
+                if (!restM) return [restStr, ''];
+                const [descWrapperStr, descStr] = restM;
+
+                return [
+                    restStr.replace(descWrapperStr, ''),
+                    descStr,
+                ];
+            })();
+
+            file.description = descStr.trim();
+
             //console.log(tagStr);
             const tags = parseTagString(tagStr);
 
@@ -64,16 +92,12 @@ export const parseFile = (dataStr: string): FileParserResult => {
                     foundTag2 = { id: resData.tags.length + 1, name: tagPair[1], parentId: foundTag1.id };
                     resData.tags.push(foundTag2);
                 }
+
+                file.tagsIds.push(foundTag2.id);
             }
         }
 
-        resData.files.push({
-            folderPath,
-            fileId,
-            description: '',
-            fav: false,
-            tagsIds: [],
-        })
+        resData.files.push(file)
     });
 
     // console.log(resData.tags.slice().sort((a, b) => a.name.localeCompare(b.name)));
