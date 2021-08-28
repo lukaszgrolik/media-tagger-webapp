@@ -27,6 +27,8 @@ export class Tag {
             parentId: observable,
             // setParentId: action,
             parent: computed,
+            ancestors: computed,
+            path: computed,
             children: computed,
 
             files: computed,
@@ -39,6 +41,20 @@ export class Tag {
 
     get parent(): Tag | null {
         return this.store.tags.find(t => t.id === this.parentId) || null;
+    }
+
+    get ancestors(): Tag[] {
+        if (!this.parent) return [];
+
+        return [...this.parent.ancestors, this.parent];
+    }
+
+    get path(): Tag[] {
+        return [...this.ancestors, this];
+    }
+
+    get pathString(): string {
+        return this.path.map(t => t.name).join('/');
     }
 
     get children() {

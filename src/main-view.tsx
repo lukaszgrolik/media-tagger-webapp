@@ -155,6 +155,21 @@ export const MainView: React.FC<{store: Store.Store}> = observer(({store}) => {
             </Sidebar>
 
             <TopBar>
+                <div>
+                    <ul style={{display: 'flex', listStyle: 'none'}}>
+                        {
+                            ['gallery', 'gallery', 'list'].map((x, i) => {
+                                return (
+                                    <li key={i}>
+                                        <button>{x}</button>
+                                    </li>
+                                );
+                            })
+
+                        }
+                    </ul>
+                </div>
+
                 <div>filtered files: {store.filtering.filePaths.length} ({store.filePaths.length} total)</div>
 
                 <div style={{display: 'flex'}}>
@@ -238,33 +253,49 @@ export const MainView: React.FC<{store: Store.Store}> = observer(({store}) => {
 
                                 return (
                                     <li key={file.path}>
-                                        {
-                                            file.fileType === 'video'
-                                                ?
-                                                <video
-                                                    // width={store.config.fileWidth}
-                                                    height={store.config.fileHeight}
-                                                    controls
-                                                    style={{ display: 'block', backgroundColor: 'black' }}
-                                                >
-                                                    <source src={url} type="video/mp4" />
-                                                </video>
-                                                :
-                                                file.fileType === 'image'
+                                        <div style={{position: 'relative'}}>
+                                            {
+                                                file.fileType === 'video'
                                                     ?
-                                                    <img
-                                                        src={url}
-                                                        alt={file.path}
+                                                    <video
                                                         // width={store.config.fileWidth}
                                                         height={store.config.fileHeight}
-                                                        style={{display: 'block'}}
-                                                    />
+                                                        controls
+                                                        style={{ display: 'block', backgroundColor: 'black' }}
+                                                    >
+                                                        <source src={url} type="video/mp4" />
+                                                    </video>
                                                     :
-                                                    <div>
-                                                        <div>{url}</div>
-                                                        <div>unsupported file extension:  {file.fileExt}</div>
-                                                    </div>
-                                        }
+                                                    file.fileType === 'image'
+                                                        ?
+                                                        <img
+                                                            src={url}
+                                                            alt={file.path}
+                                                            // width={store.config.fileWidth}
+                                                            height={store.config.fileHeight}
+                                                            style={{display: 'block'}}
+                                                        />
+                                                        :
+                                                        <div>
+                                                            <div>{url}</div>
+                                                            <div>unsupported file extension:  {file.fileExt}</div>
+                                                        </div>
+                                            }
+
+                                            {
+                                                file.file
+                                                &&
+                                                <div style={{position: 'absolute', left: 0, top: 0, backgroundColor: 'rgba(255, 255, 255, .75)', fontSize: 14}}>#{file.file.id}</div>
+                                            }
+
+                                            {
+                                                file.file?.tags.length
+                                                &&
+                                                <div style={{position: 'absolute', right: 0, top: 0, backgroundColor: 'rgba(255, 255, 255, .75)', fontSize: 14}}>
+                                                    <span title={`${file.file.tags.map(t => t.pathString).join('\n')}`}>{file.file.tags.length} tags</span>
+                                                </div>
+                                            }
+                                        </div>
                                     </li>
                                 )
                             })

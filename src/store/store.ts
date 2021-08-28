@@ -1,5 +1,6 @@
 import { action, computed, makeObservable, observable } from "mobx";
 
+import { API } from "./api";
 import { File, FileCreateBody } from "./file";
 import { Tag, TagCreateBody, TagID } from "./tag";
 
@@ -56,29 +57,7 @@ class Project {
     }
 }
 
-class API {
-    readonly API_BASE_URL = 'http://localhost:3060';
 
-    getProjectAssetsUrl(projectName: string) {
-        return `${this.API_BASE_URL}/${projectName}/assets`;
-    }
-
-    getProjectFileUrl(projectName: string, filePath: string) {
-        return `${this.getProjectAssetsUrl(projectName)}${filePath}`;
-    }
-
-    async fetchProjects() {
-        return (await fetch(`${this.API_BASE_URL}/projects`)).json();
-    }
-
-    async fetchFilePaths(projectName: string) {
-        return (await fetch(`${this.API_BASE_URL}/${projectName}/files`)).json();
-    }
-
-    async fetchDB(projectName: string) {
-        return (await fetch(`${this.API_BASE_URL}/${projectName}/db`)).json();
-    }
-}
 
 export class Store {
     readonly api = new API();
