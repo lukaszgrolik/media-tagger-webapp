@@ -2,19 +2,13 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { BrowserRouter, Link, NavLink, Route, Switch } from 'react-router-dom';
 
-import * as fileParser from './file-parser';
 import * as Store from './store/store';
 import { MainView } from './main-view';
 
-declare var TAGS_FILE: string;
+declare var window: {__store: Store.Store};
 
 const store = new Store.Store();
-
-const parsedFileData = fileParser.parseFile(TAGS_FILE);
-console.log('parsedFileData', parsedFileData)
-
-store.setTags(parsedFileData.tags);
-store.setFiles(parsedFileData.files);
+window.__store = store;
 
 // const pages = [
 
@@ -30,7 +24,7 @@ const app = (
         </ul> */}
 
         <Switch>
-            <Route path="/" exact={true}>
+            <Route path="/projects/:projectName">
                 <MainView store={store} />
             </Route>
 

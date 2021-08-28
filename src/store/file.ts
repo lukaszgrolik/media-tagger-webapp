@@ -1,24 +1,27 @@
 import { action, computed, makeObservable, observable } from "mobx";
 
 import { Store } from "./store";
-import { Tag } from "./tag";
+import { Tag, TagID } from "./tag";
+
+export type FileID = number;
 
 export interface FileCreateBody {
+    readonly id: FileID;
     readonly path: string;
     readonly description: string;
-    readonly tagsIds: number[];
+    readonly tagsIds: TagID[];
 }
 
 export class File {
-    // readonly id: number;
+    readonly id: number;
     path: string;
     description: string;
     tagsIds: number[] = [];
 
     constructor(readonly store: Store, body: FileCreateBody) {
-        // this.id = body.id;
+        this.id = body.id;
         this.path = body.path;
-        this.description = body.description;
+        this.description = body.description || '';
         this.tagsIds = body.tagsIds;
 
         makeObservable(this, {

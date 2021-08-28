@@ -5,6 +5,7 @@ interface Tag {
 }
 
 interface File {
+    id: number;
     // folderPath: string;
     // fileId: string;
     path: string;
@@ -43,6 +44,8 @@ export const parseFile = (dataStr: string): FileParserResult => {
     const lines = dataStr.split('\n').filter(l => l)
     const resData: FileParserResult = { tags: [], files: [] };
 
+    let currentFileId = 0;
+
     lines.forEach(line => {
         const m = line.match(/^(\d{4}-\d{2}-\d{2}(.+)?) \| (\d{2,3}) \|(.+)?$/);
         if (!m) throw new Error(`invalid line: ${line}`);
@@ -55,6 +58,7 @@ export const parseFile = (dataStr: string): FileParserResult => {
             return `/${folderPath}/MOV_${fileNumber}.mp4`;
         };
         const file: File = {
+            id: ++currentFileId,
             path: getFilePath(),
             description: '',
             // fav: false,

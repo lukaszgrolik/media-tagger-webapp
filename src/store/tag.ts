@@ -2,8 +2,10 @@ import { action, computed, makeObservable, observable } from "mobx";
 
 import { Store } from "./store";
 
+export type TagID = number;
+
 export interface TagCreateBody {
-    readonly id: number;
+    readonly id: TagID;
     readonly name: string;
     readonly parentId: number | null;
 }
@@ -16,7 +18,7 @@ export class Tag {
     constructor(readonly store: Store, body: TagCreateBody) {
         this.id = body.id;
         this.name = body.name;
-        this.parentId = body.parentId;
+        this.parentId = body.parentId || null;
 
         makeObservable(this, {
             name: observable,
