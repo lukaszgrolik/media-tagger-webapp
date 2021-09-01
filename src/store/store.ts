@@ -7,16 +7,31 @@ import { Tag, TagCreateBody, TagID } from "./tag";
 export * from './tag';
 export * from './file';
 
+interface FilePathBody {
+    readonly path: string;
+    readonly ctime: string;
+    readonly mtime: string;
+    readonly size: number;
+}
+
 class FilePath {
+    readonly path: string;
     readonly dir: string;
     readonly fileName: string;
     readonly fileExtRaw: string;
     readonly fileExt: string;
+
+    readonly ctime: string;
+    readonly mtime: string;
+    readonly size: number;
+
     readonly fileType: 'image' | 'video';
     readonly mediaType: 'static' | 'animated';
 
-    constructor(readonly store: Store, readonly path: string) {
-        const fileM = path.match(/^(.+)?\/(.+)\.([^\.]+)$/);
+    constructor(readonly store: Store, readonly body: FilePathBody) {
+        this.path = body.path;
+
+        const fileM = body.path.match(/^(.+)?\/(.+)\.([^\.]+)$/);
         // if (!fileM) return;
 
         const [_, dir, fileName, _fileExt] = fileM as RegExpMatchArray;
@@ -28,6 +43,10 @@ class FilePath {
         this.fileExtRaw = _fileExt;
         this.fileExt = _fileExt.toLowerCase();
         if (this.fileExt === 'jpeg') this.fileExt = 'jpg';
+
+        this.ctime = body.ctime;
+        this.mtime = body.mtime;
+        this.size = body.size;
 
         this.fileType = (() => {
             if (['jpg', 'png', 'gif', 'svg', 'webp'].includes(this.fileExt)) return 'image';
@@ -49,6 +68,20 @@ class FilePath {
     get file() {
         return this.store.files.find(f => f.path === this.path);
     }
+
+    get sizeString() {
+        const mb = this.size / (2 ** 10) ** 2;
+        const mbInt = Math.round(mb);
+
+        const val = (() => {
+            if (mbInt.toString().length < 2)
+                return mb.toFixed(1);
+            else
+                return mbInt;
+        })();
+
+        return `${val} MB`;
+    }
 }
 
 class Project {
@@ -57,19 +90,43 @@ class Project {
     }
 }
 
+interface TabBody {
+    readonly config?: ConfigBody;
+    readonly sorting?: SortingBody;
+    readonly pagination?: PaginationBody;
+}
 
+class Tab {
+    readonly config: Config;
+    readonly filtering: Filtering;
+    readonly sorting: Sorting;
+    readonly pagination: Pagination;
+
+    constructor(readonly store: Store, body?: TabBody) {
+        this.config = new Config(this.store, body?.config || {});
+        this.filtering = new Filtering(this.store);
+        this.sorting = new Sorting(this.store, this, body?.sorting || {});
+        this.pagination = new Pagination(this.store, this, body?.pagination || {});
+    }
+}
 
 export class Store {
     readonly api = new API();
-    readonly config = new Config(this);
-    readonly filtering = new Filtering(this);
-    readonly sorting = new Sorting(this);
-    readonly pagination = new Pagination(this);
 
     readonly filePaths: FilePath[] = [];
-
     readonly tags: Tag[] = [];
     readonly files: File[] = [];
+
+    readonly tabs = [
+        new Tab(this),
+        new Tab(this, {
+            pagination: {perPage: 20, currentPage: 10},
+        }),
+        new Tab(this, {
+            config: {fileHeight: 100},
+        }),
+    ];
+    activeTab = this.tabs[0];
 
     constructor() {
         makeObservable(this, {
@@ -82,10 +139,14 @@ export class Store {
             tags: observable,
             setTags: action,
             topLevelTags: computed,
+
+            tabs: observable,
+            activeTab: observable,
+            setActiveTab: action,
         });
     }
 
-    setFilePaths(files: string[]) {
+    setFilePaths(files: FilePathBody[]) {
         this.filePaths.length = 0;
         this.filePaths.push(...files.map(f => new FilePath(this, f)));
     }
@@ -103,13 +164,25 @@ export class Store {
         this.files.length = 0;
         this.files.push(...tags.map(t => new File(this, t)))
     }
+
+    setActiveTab(tab: Tab) {
+        this.activeTab = tab;
+    }
+}
+
+interface PaginationBody {
+    readonly perPage?: number;
+    readonly currentPage?: number;
 }
 
 class Pagination {
     perPage: number = 100;
     currentPage = 0;
 
-    constructor(readonly store: Store) {
+    constructor(readonly store: Store, readonly tab: Tab, body: PaginationBody) {
+        if (body.perPage !== undefined) this.perPage = body.perPage;
+        if (body.currentPage !== undefined) this.currentPage = body.currentPage;
+
         makeObservable(this, {
             perPage: observable,
             setPerPage: action,
@@ -130,12 +203,12 @@ class Pagination {
         const start = this.currentPage * this.perPage;
         const end = start + this.perPage;
 
-        return this.store.sorting.filePaths.slice(start, end);
+        return this.tab.sorting.filePaths.slice(start, end);
     }
 
     get pagesCount() {
-        console.log(this.store.filtering.filePaths.length, this.perPage)
-        return Math.ceil(this.store.filtering.filePaths.length / this.perPage);
+        console.log(this.tab.filtering.filePaths.length, this.perPage)
+        return Math.ceil(this.tab.filtering.filePaths.length / this.perPage);
     }
 
     setPerPage(value: number) {
@@ -173,11 +246,19 @@ class Pagination {
     }
 }
 
+interface ConfigBody {
+    readonly fileWidth?: number;
+    readonly fileHeight?: number;
+}
+
 class Config {
     fileWidth = 480;
     fileHeight = 270;
 
-    constructor(readonly store: Store) {
+    constructor(readonly store: Store, body: ConfigBody) {
+        if (body.fileWidth !== undefined) this.fileWidth = body.fileWidth;
+        if (body.fileHeight !== undefined) this.fileHeight = body.fileHeight;
+
         makeObservable(this, {
             fileWidth: observable,
             fileHeight: observable,
@@ -266,12 +347,24 @@ class Filtering {
     }
 }
 
-class Sorting {
-    sorting: 'asc' | 'desc' = 'asc';
+type SortingField = 'path' | 'mtime' | 'size';
 
-    constructor(readonly store: Store) {
+interface SortingBody {
+    readonly field?: SortingField;
+    readonly asc?: boolean;
+}
+
+class Sorting {
+    field: SortingField = 'mtime';
+    asc = true;
+
+    constructor(readonly store: Store, readonly tab: Tab, body: SortingBody) {
+        if (body.field !== undefined) this.field = body.field;
+        if (body.asc !== undefined) this.asc = body.asc;
+
         makeObservable(this, {
-            sorting: observable,
+            field: observable,
+            asc: observable,
             setSorting: action,
 
             filePaths: computed,
@@ -281,10 +374,26 @@ class Sorting {
     get filePaths() {
         // @todo sort by file creation date
         // return this.store.filtering.filePaths.slice().sort((a, b) => )
-        return this.store.filtering.filePaths;
+        return this.tab.filtering.filePaths.slice().sort((a, b) => {
+            if (this.field === 'path' || this.field === 'mtime') {
+                if (this.asc)
+                    return a[this.field].localeCompare(b[this.field]);
+                else
+                    return b[this.field].localeCompare(a[this.field]);
+            }
+            else if (this.field === 'size') {
+                if (this.asc)
+                    return a[this.field] - b[this.field];
+                else
+                    return b[this.field] - a[this.field];
+            }
+
+            return 0;
+        });
     }
 
-    setSorting(value: 'asc' | 'desc') {
-        this.sorting = value;
+    setSorting(field: SortingField, asc: boolean) {
+        this.field = field;
+        this.asc = asc;
     }
 }

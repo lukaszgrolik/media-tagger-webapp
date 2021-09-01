@@ -33,8 +33,16 @@ const Sidebar = styled.div`
     font-size: 14px;
 `;
 const TopBar = styled.div`
+    background-color: #eee;
     grid-area: top-bar;
     padding: 2em;
+`;
+const SettingsBlock = styled.div`
+    display: flex;
+
+    > * + * {
+        margin-left: 2em;
+    }
 `;
 const MainContent = styled.div`
     grid-area: main-content;
@@ -134,6 +142,7 @@ export const MainView: React.FC<{store: Store.Store}> = observer(({store}) => {
     const taggedFiles = store.files.filter(f => f.tagsIds.length !== 0);
     const nonTaggedFiles = store.files.filter(f => f.tagsIds.length === 0);
     const filesWithDescription = store.files.filter(f => f.description);
+    const tab = store.activeTab;
 
     return (
         <Wrapper>
@@ -158,10 +167,18 @@ export const MainView: React.FC<{store: Store.Store}> = observer(({store}) => {
                 <div>
                     <ul style={{display: 'flex', listStyle: 'none'}}>
                         {
-                            ['gallery', 'gallery', 'list'].map((x, i) => {
+                            // ['gallery', 'gallery', 'list']
+                            store.tabs.map((tab, i) => {
                                 return (
                                     <li key={i}>
-                                        <button>{x}</button>
+                                        <button
+                                            style={{fontWeight: store.activeTab === tab ? 'bold' : 'normal'}}
+                                            onClick={() => {
+                                                if (store.activeTab === tab) return;
+
+                                                store.setActiveTab(tab);
+                                            }}
+                                        >tab #{i}</button>
                                     </li>
                                 );
                             })
@@ -170,117 +187,142 @@ export const MainView: React.FC<{store: Store.Store}> = observer(({store}) => {
                     </ul>
                 </div>
 
-                <div>filtered files: {store.filtering.filePaths.length} ({store.filePaths.length} total)</div>
-
-                <div style={{display: 'flex'}}>
-                    <div>sort</div>
-                    <button
-                        onClick={() => {
-                            store.sorting.setSorting(store.sorting.sorting === 'asc' ? 'desc' : 'asc');
-                        }}
-                    >{store.sorting.sorting === 'asc' ? 'asc' : 'desc'}</button>
-                </div>
-
-                <div style={{display: 'flex'}}>
-                    <button
-                        disabled={store.pagination.isFirstPage}
-                        onClick={() => {
-                            store.pagination.goToPrevPage();
-                        }}
-                    >prev</button>
-                    {/* <div>1 2 3 ... 8 (9) 10 ... 56 57 58</div> */}
-                    <div>{store.pagination.pagesCount}</div>
-                    <button
-                        disabled={store.pagination.isLastPage}
-                        onClick={() => {
-                            store.pagination.goToNextPage();
-                        }}
-                    >next</button>
-                </div>
-
-                <form style={{display: 'flex'}}>
-                    <div>go to page:</div>
-                    <input
-                        type="number"
-                        value={store.pagination.currentPage}
-                        onChange={e => {
-                            store.pagination.setCurrentPage(e.currentTarget.valueAsNumber);
-                        }}
-                    />
-                </form>
-
-                <form style={{display: 'flex'}}>
-                    <div>per page</div>
-                    <input
-                        type="number"
-                        value={store.pagination.perPage}
-                        onChange={e => {
-                            store.pagination.setPerPage(e.currentTarget.valueAsNumber);
-                        }}
-                    />
-                </form>
-
-                <form style={{display: 'flex'}}>
-                    <div>max height</div>
-                    <input
-                        type="number"
-                        value={store.config.fileHeight}
-                        onChange={e => {
-                            store.config.setFileHeight(e.currentTarget.valueAsNumber);
-                        }}
-                    />
-                    <input
-                        type="range"
-                        min={100}
-                        max={700}
-                        step={25}
-                        value={store.config.fileHeight}
-                        onChange={e => {
-                            store.config.setFileHeight(e.currentTarget.valueAsNumber);
-                        }}
-                    />
-                </form>
+                <SettingsBlock>
+                    <div>filtered files: {tab.filtering.filePaths.length} ({store.filePaths.length} total)</div>
+                    <div style={{display: 'flex'}}>
+                        <div>sort</div>
+                        <button
+                            style={{ fontWeight: tab.sorting.field === 'path' ? 'bold' : 'normal' }}
+                            onClick={() => {
+                                tab.sorting.setSorting('path', tab.sorting.asc);
+                            }}
+                        >path</button>
+                        <button
+                            style={{ fontWeight: tab.sorting.field === 'mtime' ? 'bold' : 'normal' }}
+                            onClick={() => {
+                                tab.sorting.setSorting('mtime', tab.sorting.asc);
+                            }}
+                        >mtime</button>
+                        <button
+                            style={{ fontWeight: tab.sorting.field === 'size' ? 'bold' : 'normal' }}
+                            onClick={() => {
+                                tab.sorting.setSorting('size', tab.sorting.asc);
+                            }}
+                        >size</button>
+                        <button
+                            onClick={() => {
+                                tab.sorting.setSorting(tab.sorting.field, !tab.sorting.asc);
+                            }}
+                        >{tab.sorting.asc ? 'asc' : 'desc'}</button>
+                    </div>
+                    <div style={{display: 'flex'}}>
+                        <button
+                            disabled={tab.pagination.isFirstPage}
+                            onClick={() => {
+                                tab.pagination.goToPrevPage();
+                            }}
+                        >prev</button>
+                        {/* <div>1 2 3 ... 8 (9) 10 ... 56 57 58</div> */}
+                        <form style={{ display: 'flex' }}>
+                            <div>go to page:</div>
+                            <input
+                                type="number"
+                                value={tab.pagination.currentPage}
+                                onChange={e => {
+                                    tab.pagination.setCurrentPage(e.currentTarget.valueAsNumber);
+                                }}
+                            />
+                        </form>
+                        <div> / {tab.pagination.pagesCount}</div>
+                        <button
+                            disabled={tab.pagination.isLastPage}
+                            onClick={() => {
+                                tab.pagination.goToNextPage();
+                            }}
+                        >next</button>
+                        <form style={{ display: 'flex' }}>
+                            <div>per page</div>
+                            <input
+                                type="number"
+                                value={tab.pagination.perPage}
+                                onChange={e => {
+                                    tab.pagination.setPerPage(e.currentTarget.valueAsNumber);
+                                }}
+                            />
+                        </form>
+                    </div>
+                    <form style={{display: 'flex'}}>
+                        <div>max height</div>
+                        <input
+                            type="number"
+                            value={tab.config.fileHeight}
+                            onChange={e => {
+                                tab.config.setFileHeight(e.currentTarget.valueAsNumber);
+                            }}
+                        />
+                        <input
+                            type="range"
+                            min={100}
+                            max={700}
+                            step={25}
+                            value={tab.config.fileHeight}
+                            onChange={e => {
+                                tab.config.setFileHeight(e.currentTarget.valueAsNumber);
+                            }}
+                        />
+                    </form>
+                </SettingsBlock>
             </TopBar>
 
             {
                 loaded
                 &&
                 <MainContent>
-                    <MediaList width={store.config.fileWidth} height={store.config.fileHeight}>
+                    <MediaList width={tab.config.fileWidth} height={tab.config.fileHeight}>
                         {
-                            store.pagination.filePaths.map(file => {
+                            tab.pagination.filePaths.map(file => {
                                 const url = store.api.getProjectFileUrl(projectName, file.path);
 
                                 return (
                                     <li key={file.path}>
                                         <div style={{position: 'relative'}}>
-                                            {
-                                                file.fileType === 'video'
-                                                    ?
-                                                    <video
-                                                        // width={store.config.fileWidth}
-                                                        height={store.config.fileHeight}
-                                                        controls
-                                                        style={{ display: 'block', backgroundColor: 'black' }}
-                                                    >
-                                                        <source src={url} type="video/mp4" />
-                                                    </video>
-                                                    :
-                                                    file.fileType === 'image'
+                                            <div title={file.mtime}>
+                                                {
+                                                    file.fileType === 'video'
                                                         ?
-                                                        <img
-                                                            src={url}
-                                                            alt={file.path}
-                                                            // width={store.config.fileWidth}
-                                                            height={store.config.fileHeight}
-                                                            style={{display: 'block'}}
-                                                        />
+                                                        <video
+                                                            // width={tab.config.fileWidth}
+                                                            height={tab.config.fileHeight}
+                                                            controls
+                                                            style={{ display: 'block', backgroundColor: 'black' }}
+                                                        >
+                                                            <source src={url} type="video/mp4" />
+                                                        </video>
                                                         :
-                                                        <div>
-                                                            <div>{url}</div>
-                                                            <div>unsupported file extension:  {file.fileExt}</div>
-                                                        </div>
-                                            }
+                                                        file.fileType === 'image'
+                                                            ?
+                                                            <img
+                                                                src={url}
+                                                                alt={file.path}
+                                                                // width={tab.config.fileWidth}
+                                                                height={tab.config.fileHeight}
+                                                                style={{display: 'block'}}
+                                                            />
+                                                            :
+                                                            <div>
+                                                                <div>{url}</div>
+                                                                <div>unsupported file extension:  {file.fileExt}</div>
+                                                            </div>
+                                                }
+                                            </div>
+
+                                            <div style={{position: 'absolute', left: 0, bottom: 0, backgroundColor: 'rgba(255, 255, 255, .75)', fontSize: 14}}>
+                                                <a href={url} title={file.path}>link</a>
+                                            </div>
+
+                                            <div style={{position: 'absolute', right: 0, bottom: 0, backgroundColor: 'rgba(255, 255, 255, .75)', fontSize: 14}}>
+                                                {file.sizeString}
+                                            </div>
 
                                             {
                                                 file.file
