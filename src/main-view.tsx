@@ -107,9 +107,21 @@ export const TagsBlock: React.FC<{store: Store.Store; tags: Store.Tag[]}> = obse
             <ul>
                 {
                     tags.slice().sort((a, b) => a.name.localeCompare(b.name)).map(tag => {
+                        const isFilteredByTag = store.activeTab.filtering.tagsIds.includes(tag.id);
+
                         return (
                             <li key={tag.id}>
-                                <div><span title={`#${tag.id}`}>{tag.name}</span> ({tag.files.length} files)</div>
+                                <div>
+                                    <span
+                                        title={`#${tag.id}`}
+                                        style={{ fontWeight: isFilteredByTag ? 'bold' : 'normal' }}
+                                        onClick={() => {
+                                            store.addTab({
+                                                filtering: {tagsIds: [tag.id]}
+                                            });
+                                        }}
+                                    >{tag.name}</span> ({tag.files.length} files)
+                                </div>
 
                                 {
                                     tag.children.length > 0
@@ -178,7 +190,7 @@ export const MainView: React.FC<{store: Store.Store}> = observer(({store}) => {
 
                                                 store.setActiveTab(tab);
                                             }}
-                                        >tab #{i}</button>
+                                        >tab #{i} ({tab.filtering.filePaths.length})</button>
                                     </li>
                                 );
                             })
@@ -280,61 +292,63 @@ export const MainView: React.FC<{store: Store.Store}> = observer(({store}) => {
                 <MainContent>
                     <MediaList width={tab.config.fileWidth} height={tab.config.fileHeight}>
                         {
-                            tab.pagination.filePaths.map(file => {
-                                const url = store.api.getProjectFileUrl(projectName, file.path);
+                            tab.pagination.filePaths.map(filePath => {
+                                const url = store.api.getProjectFileUrl(projectName, filePath.path);
 
                                 return (
-                                    <li key={file.path}>
+                                    <li key={filePath.path}>
                                         <div style={{position: 'relative'}}>
-                                            <div title={file.mtime}>
+                                            <div title={filePath.mtime}>
                                                 {
-                                                    file.fileType === 'video'
+                                                    filePath.fileType === 'video'
                                                         ?
                                                         <video
-                                                            // width={tab.config.fileWidth}
+                                                            width={tab.config.fileHeight * 16 / 9}
                                                             height={tab.config.fileHeight}
                                                             controls
+                                                            preload="none"
                                                             style={{ display: 'block', backgroundColor: 'black' }}
                                                         >
                                                             <source src={url} type="video/mp4" />
                                                         </video>
                                                         :
-                                                        file.fileType === 'image'
+                                                        filePath.fileType === 'image'
                                                             ?
                                                             <img
                                                                 src={url}
-                                                                alt={file.path}
+                                                                alt={filePath.path}
                                                                 // width={tab.config.fileWidth}
                                                                 height={tab.config.fileHeight}
                                                                 style={{display: 'block'}}
+                                                                loading="lazy"
                                                             />
                                                             :
                                                             <div>
                                                                 <div>{url}</div>
-                                                                <div>unsupported file extension:  {file.fileExt}</div>
+                                                                <div>unsupported file extension:  {filePath.fileExt}</div>
                                                             </div>
                                                 }
                                             </div>
 
                                             <div style={{position: 'absolute', left: 0, bottom: 0, backgroundColor: 'rgba(255, 255, 255, .75)', fontSize: 14}}>
-                                                <a href={url} title={file.path}>link</a>
+                                                <a href={url} title={filePath.path}>link</a>
                                             </div>
 
                                             <div style={{position: 'absolute', right: 0, bottom: 0, backgroundColor: 'rgba(255, 255, 255, .75)', fontSize: 14}}>
-                                                {file.sizeString}
+                                                {filePath.sizeString}
                                             </div>
 
                                             {
-                                                file.file
+                                                filePath.file
                                                 &&
-                                                <div style={{position: 'absolute', left: 0, top: 0, backgroundColor: 'rgba(255, 255, 255, .75)', fontSize: 14}}>#{file.file.id}</div>
+                                                <div style={{position: 'absolute', left: 0, top: 0, backgroundColor: 'rgba(255, 255, 255, .75)', fontSize: 14}}>#{filePath.file.id}</div>
                                             }
 
                                             {
-                                                file.file?.tags.length
+                                                filePath.file?.tags.length
                                                 &&
                                                 <div style={{position: 'absolute', right: 0, top: 0, backgroundColor: 'rgba(255, 255, 255, .75)', fontSize: 14}}>
-                                                    <span title={`${file.file.tags.map(t => t.pathString).join('\n')}`}>{file.file.tags.length} tags</span>
+                                                    <span title={`${filePath.file.tags.map(t => t.pathString).join('\n')}`}>{filePath.file.tags.length} tags</span>
                                                 </div>
                                             }
                                         </div>

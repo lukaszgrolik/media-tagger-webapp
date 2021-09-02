@@ -16,7 +16,7 @@ export class File {
     readonly id: number;
     path: string;
     description: string;
-    tagsIds: number[] = [];
+    readonly tagsIds: number[] = [];
 
     constructor(readonly store: Store, body: FileCreateBody) {
         this.id = body.id;
@@ -28,9 +28,15 @@ export class File {
             path: observable,
             // setName: action,
 
+            filePath: computed,
+
             tagsIds: observable,
             tags: computed,
         });
+    }
+
+    get filePath() {
+        return this.store.filePaths.find(fp => fp.path === this.path);
     }
 
     get tags() {

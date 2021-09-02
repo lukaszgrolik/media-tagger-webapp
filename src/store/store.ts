@@ -7,6 +7,63 @@ import { Tag, TagCreateBody, TagID } from "./tag";
 export * from './tag';
 export * from './file';
 
+// function moveItem<T, S>(arr: T[], cb: (i: T) => S, items: S[], newIndex: number): T[] {
+function moveItem<T>(arr: T[], items: T[], newIndex: number): {result: T[]; changes: [T, number][]} {
+    // @todo newIndex must be less or equal than arr.length
+    // @todo arr items must be unique
+    // @todo items must not contain an element at newIndex
+
+    const arrTemp = arr.slice();
+    const newIndexCurrentItem = arrTemp[newIndex];
+
+    items.forEach(i => {
+        const index = arrTemp.indexOf(i);
+
+        if (index !== -1) {
+            arrTemp.splice(index, 1);
+        }
+    });
+
+    const index = newIndex !== arr.length ? arrTemp.indexOf(newIndexCurrentItem) : arrTemp.length;
+    arrTemp.splice(index, 0, ...items);
+
+    const res: [T, number][] = [];
+
+    items.forEach((a, i) => {
+        const j = arrTemp.indexOf(a);
+
+        if (i !== j) {
+            res.push([a, i]);
+        }
+    });
+
+    return {
+        result: arrTemp,
+        changes: res,
+    };
+}
+
+moveItem(['a', 'b', 'c', 'd'], ['c'], 0);
+moveItem(['a', 'b', 'c', 'd'], ['c'], 1); // => [['c', 1], ['b', 2]]
+moveItem(['a', 'b', 'c', 'd'], ['c'], 0);
+
+moveItem(['a', 'b', 'c', 'd'], ['c', 'd'], 1); // => [['c', 1], ['d', 2], ['b', 3]]
+
+moveItem(['a', 'b', 'c', 'd'], ['e'], 0);
+moveItem(['a', 'b', 'c', 'd'], ['e'], 1);
+moveItem(['a', 'b', 'c', 'd'], ['e'], 4);
+moveItem(['a', 'b', 'c', 'd'], ['e'], 5);
+
+moveItem(['a', 'b', 'c', 'd'], ['e', 'f'], 0);
+moveItem(['a', 'b', 'c', 'd'], ['e', 'f'], 1);
+moveItem(['a', 'b', 'c', 'd'], ['e', 'f'], 4);
+moveItem(['a', 'b', 'c', 'd'], ['e', 'f'], 5);
+
+moveItem(['a', 'b', 'c', 'd'], ['b', 'f'], 0);
+moveItem(['a', 'b', 'c', 'd'], ['a', 'f'], 1);
+moveItem(['a', 'b', 'c', 'd'], ['a', 'f'], 4);
+moveItem(['a', 'b', 'c', 'd'], ['a', 'f'], 5);
+
 interface FilePathBody {
     readonly path: string;
     readonly ctime: string;
@@ -92,6 +149,7 @@ class Project {
 
 interface TabBody {
     readonly config?: ConfigBody;
+    readonly filtering?: FilteringBody;
     readonly sorting?: SortingBody;
     readonly pagination?: PaginationBody;
 }
@@ -102,11 +160,11 @@ class Tab {
     readonly sorting: Sorting;
     readonly pagination: Pagination;
 
-    constructor(readonly store: Store, body?: TabBody) {
-        this.config = new Config(this.store, body?.config || {});
-        this.filtering = new Filtering(this.store);
-        this.sorting = new Sorting(this.store, this, body?.sorting || {});
-        this.pagination = new Pagination(this.store, this, body?.pagination || {});
+    constructor(readonly store: Store, body: TabBody = {}) {
+        this.config = new Config(this.store, body.config);
+        this.filtering = new Filtering(this.store, body.filtering);
+        this.sorting = new Sorting(this.store, this, body.sorting);
+        this.pagination = new Pagination(this.store, this, body.pagination);
     }
 }
 
@@ -143,6 +201,7 @@ export class Store {
             tabs: observable,
             activeTab: observable,
             setActiveTab: action,
+            addTab: action,
         });
     }
 
@@ -168,6 +227,13 @@ export class Store {
     setActiveTab(tab: Tab) {
         this.activeTab = tab;
     }
+
+    addTab(body: TabBody) {
+        const tab = new Tab(this, body);
+
+        this.tabs.push(tab);
+        this.activeTab = tab;
+    }
 }
 
 interface PaginationBody {
@@ -179,7 +245,7 @@ class Pagination {
     perPage: number = 100;
     currentPage = 0;
 
-    constructor(readonly store: Store, readonly tab: Tab, body: PaginationBody) {
+    constructor(readonly store: Store, readonly tab: Tab, body: PaginationBody = {}) {
         if (body.perPage !== undefined) this.perPage = body.perPage;
         if (body.currentPage !== undefined) this.currentPage = body.currentPage;
 
@@ -207,7 +273,6 @@ class Pagination {
     }
 
     get pagesCount() {
-        console.log(this.tab.filtering.filePaths.length, this.perPage)
         return Math.ceil(this.tab.filtering.filePaths.length / this.perPage);
     }
 
@@ -255,7 +320,7 @@ class Config {
     fileWidth = 480;
     fileHeight = 270;
 
-    constructor(readonly store: Store, body: ConfigBody) {
+    constructor(readonly store: Store, body: ConfigBody = {}) {
         if (body.fileWidth !== undefined) this.fileWidth = body.fileWidth;
         if (body.fileHeight !== undefined) this.fileHeight = body.fileHeight;
 
@@ -275,13 +340,28 @@ class Config {
 type FileType = 'image' | 'video';
 type MediaType = 'static' | 'animated';
 
+interface FilteringBody {
+    readonly name?: string;
+    readonly fileType?: FileType | null;
+    readonly mediaType?: MediaType | null;
+    readonly tagsIds?: TagID[];
+}
+
 class Filtering {
     name = '';
     fileType: FileType | null = null;
     mediaType: MediaType | null = null;
+    // minDate: string | null = null;
+    // maxDate: string | null = null;
     readonly tagsIds: TagID[] = [];
+    // negateTags = false;
 
-    constructor(readonly store: Store) {
+    constructor(readonly store: Store, body: FilteringBody = {}) {
+        if (body.name !== undefined) this.name = body.name;
+        if (body.fileType !== undefined) this.fileType = body.fileType;
+        if (body.mediaType !== undefined) this.mediaType = body.mediaType;
+        if (body.tagsIds !== undefined) this.tagsIds = body.tagsIds;
+
         makeObservable(this, {
             fileType: observable,
             setFileType: action,
@@ -333,13 +413,18 @@ class Filtering {
                 if (filePath.mediaType !== this.mediaType) return false;
             }
 
-            const {file} = filePath;
-            if (file) {
-                const hasMissingTags = this.tagsIds.some(tagId => {
-                    return file.tagsIds.includes(tagId) === false;
-                });
+            if (this.tagsIds.length) {
+                const {file} = filePath;
+                if (file) {
+                    const hasMissingTags = this.tagsIds.some(tagId => {
+                        return file.tagsIds.includes(tagId) === false;
+                    });
 
-                if (hasMissingTags) return false;
+                    if (hasMissingTags) return false;
+                }
+                else {
+                    return false;
+                }
             }
 
             return true;
@@ -358,7 +443,7 @@ class Sorting {
     field: SortingField = 'mtime';
     asc = true;
 
-    constructor(readonly store: Store, readonly tab: Tab, body: SortingBody) {
+    constructor(readonly store: Store, readonly tab: Tab, body: SortingBody = {}) {
         if (body.field !== undefined) this.field = body.field;
         if (body.asc !== undefined) this.asc = body.asc;
 
