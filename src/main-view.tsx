@@ -6,9 +6,15 @@ import styled from '@emotion/styled';
 
 import * as fileParser from './file-parser';
 import * as Store from './store/store';
+import { GlobalUtils } from './global-utils';
 
 declare var TAGS_FILE: string;
-declare var window: {loadProject: (...args: any[]) => any}
+declare var window: {
+    loadProject: (...args: any[]) => any;
+    __globalUtils: GlobalUtils;
+}
+
+window.__globalUtils = new GlobalUtils();
 
 const Wrapper = styled.div`
     /* padding: 2em;
@@ -238,6 +244,7 @@ export const MainView: React.FC<{store: Store.Store}> = observer(({store}) => {
                         <form style={{ display: 'flex' }}>
                             <div>go to page:</div>
                             <input
+                                style={{width: `${tab.pagination.pagesCount.toString().length + 2}em`, fontFamily: 'monospace'}}
                                 type="number"
                                 value={tab.pagination.currentPage}
                                 onChange={e => {
@@ -255,6 +262,7 @@ export const MainView: React.FC<{store: Store.Store}> = observer(({store}) => {
                         <form style={{ display: 'flex' }}>
                             <div>per page</div>
                             <input
+                                style={{width: `${3 + 2}em`, fontFamily: 'monospace'}}
                                 type="number"
                                 value={tab.pagination.perPage}
                                 onChange={e => {
@@ -266,6 +274,7 @@ export const MainView: React.FC<{store: Store.Store}> = observer(({store}) => {
                     <form style={{display: 'flex'}}>
                         <div>max height</div>
                         <input
+                            style={{ width: `${3 + 2}em`, fontFamily: 'monospace' }}
                             type="number"
                             value={tab.config.fileHeight}
                             onChange={e => {
@@ -293,7 +302,23 @@ export const MainView: React.FC<{store: Store.Store}> = observer(({store}) => {
                     <MediaList width={tab.config.fileWidth} height={tab.config.fileHeight}>
                         {
                             tab.pagination.filePaths.map(filePath => {
-                                const url = store.api.getProjectFileUrl(projectName, filePath.path);
+                                const assetUrl = store.api.getProjectFileUrl(projectName, filePath.path);
+                                const thumbnailUrl = (() => {
+                                    const thumbSizes = [90, 180, 360, 720];
+                                    const {fileHeight} = tab.config;
+
+                                    if (filePath.fileExt === 'gif') {
+                                        return assetUrl;
+                                    }
+                                    else if (fileHeight > thumbSizes[thumbSizes.length - 1]) {
+                                        return assetUrl;
+                                    }
+                                    else {
+                                        const thumbSize = thumbSizes.find(s => s >= fileHeight) as number;
+
+                                        return store.api.getProjectFileThumbnailUrl(projectName, filePath.path, thumbSize);
+                                    }
+                                })();
 
                                 return (
                                     <li key={filePath.path}>
@@ -309,29 +334,29 @@ export const MainView: React.FC<{store: Store.Store}> = observer(({store}) => {
                                                             preload="none"
                                                             style={{ display: 'block', backgroundColor: 'black' }}
                                                         >
-                                                            <source src={url} type="video/mp4" />
+                                                            <source src={assetUrl} type="video/mp4" />
                                                         </video>
                                                         :
                                                         filePath.fileType === 'image'
                                                             ?
                                                             <img
-                                                                src={url}
+                                                                src={thumbnailUrl}
                                                                 alt={filePath.path}
                                                                 // width={tab.config.fileWidth}
                                                                 height={tab.config.fileHeight}
-                                                                style={{display: 'block'}}
+                                                                style={{ display: 'block' }}
                                                                 loading="lazy"
                                                             />
                                                             :
                                                             <div>
-                                                                <div>{url}</div>
+                                                                <div>{assetUrl}</div>
                                                                 <div>unsupported file extension:  {filePath.fileExt}</div>
                                                             </div>
                                                 }
                                             </div>
 
                                             <div style={{position: 'absolute', left: 0, bottom: 0, backgroundColor: 'rgba(255, 255, 255, .75)', fontSize: 14}}>
-                                                <a href={url} title={filePath.path}>link</a>
+                                                <a href={assetUrl} title={filePath.path}>link</a>
                                             </div>
 
                                             <div style={{position: 'absolute', right: 0, bottom: 0, backgroundColor: 'rgba(255, 255, 255, .75)', fontSize: 14}}>

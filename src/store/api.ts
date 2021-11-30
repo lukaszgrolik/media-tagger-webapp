@@ -14,8 +14,22 @@ export class API {
         return `${this.API_BASE_URL}/${projectName}/assets`;
     }
 
+    getProjectThumbnailsUrl(projectName: string) {
+        return `${this.API_BASE_URL}/${projectName}/thumbnails`;
+    }
+
     getProjectFileUrl(projectName: string, filePath: string) {
         return `${this.getProjectAssetsUrl(projectName)}${filePath}`;
+    }
+
+    getProjectFileThumbnailUrl(projectName: string, filePath: string, size: number) {
+        const m = filePath.match(/([^\.]+)(\..+)$/);
+        if (!m) throw new Error(`invalid filePath: ${filePath}`);
+
+        const [_, basePath, ext] = m;
+        const thumbnailFilePath = `${basePath}_${size}${ext}`;
+
+        return `${this.getProjectThumbnailsUrl(projectName)}${thumbnailFilePath}`;
     }
 
     async fetchProjects() {
