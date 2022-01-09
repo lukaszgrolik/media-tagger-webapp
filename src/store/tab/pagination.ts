@@ -45,6 +45,8 @@ export class Pagination {
     }
 
     setPerPage(value: number) {
+        if (!value) return;
+
         const max = 100;
         this.perPage = Math.min(value, max);
 

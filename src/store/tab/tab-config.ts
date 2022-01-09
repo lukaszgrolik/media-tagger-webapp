@@ -25,6 +25,8 @@ export class Config {
     }
 
     setFileHeight(value: number) {
+        if (!value) return;
+
         this.fileHeight = value;
     }
 }
