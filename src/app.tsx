@@ -3,12 +3,17 @@ import * as ReactDOM from 'react-dom';
 import { BrowserRouter, Link, NavLink, Route, Switch } from 'react-router-dom';
 
 import * as Store from './store/store';
+import { GlobalUtils } from './lib/global-utils';
 import { MainView } from './main-view';
 
-declare var window: {__store: Store.Store};
+declare var window: {
+    __store: Store.Store;
+    __globalUtils: GlobalUtils;
+};
 
 const store = new Store.Store();
 window.__store = store;
+window.__globalUtils = new GlobalUtils(store);
 
 // const pages = [
 

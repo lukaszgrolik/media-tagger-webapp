@@ -1,20 +1,17 @@
-import { TagID } from "./tag";
-
-interface SetFilesTagsBody {
-    filePaths: string[];
-    addedTagsIds?: TagID[];
-    removedTagsIds?: TagID[];
-    newTags?: (string | {name: string; parentId: TagID})[]
-}
+import { ApiFiles } from "./files";
+import { ApiTags } from "./tags";
 
 export class API {
     readonly API_BASE_URL = 'http://localhost:3060';
 
-    getProjectAssetsUrl(projectName: string) {
+    readonly tags = new ApiTags(this);
+    readonly files = new ApiFiles(this);
+
+    private getProjectAssetsUrl(projectName: string) {
         return `${this.API_BASE_URL}/${projectName}/assets`;
     }
 
-    getProjectThumbnailsUrl(projectName: string) {
+    private getProjectThumbnailsUrl(projectName: string) {
         return `${this.API_BASE_URL}/${projectName}/thumbnails`;
     }
 
@@ -42,29 +39,5 @@ export class API {
 
     async fetchDB(projectName: string) {
         return (await fetch(`${this.API_BASE_URL}/${projectName}/db`)).json();
-    }
-
-    // @todo
-    async setFileTags(projectName: string, body: SetFilesTagsBody) {
-        fetch(`${this.API_BASE_URL}/${projectName}/db/`, {
-            method: 'post',
-            // body: JSON.stringify(body),
-        });
-    }
-
-    async deleteFiles(projectName: string, filePaths: string[]) {
-
-    }
-
-    async createTags(projectName: string, body: {name: string; parentId: TagID | null}[]) {
-
-    }
-
-    async updateTag(projectName: string, tagId: TagID, body: {name: string; parentId: TagID | null}) {
-
-    }
-
-    async updateTags(projectName: string, body: {tagsIds: TagID[], parentId: TagID | null}) {
-
     }
 }

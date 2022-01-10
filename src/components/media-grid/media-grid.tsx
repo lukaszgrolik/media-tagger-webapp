@@ -6,7 +6,6 @@ import styled from '@emotion/styled';
 
 import * as fileParser from '../../lib/file-parser';
 import * as Store from '../../store/store';
-import { GlobalUtils } from '../../lib/global-utils';
 import { MediaItem } from './media-item';
 
 const Wrapper = styled.div`

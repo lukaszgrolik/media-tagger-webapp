@@ -17,8 +17,6 @@ declare var window: {
     __globalUtils: GlobalUtils;
 }
 
-window.__globalUtils = new GlobalUtils();
-
 const Wrapper = styled.div`
     /* padding: 2em;
     display: flex;
@@ -74,6 +72,8 @@ export const MainView: React.FC<{store: Store.Store}> = observer(({store}) => {
 
     React.useEffect(() => {
         document.title = `media-tagger | ${projectName}`;
+
+        window.__globalUtils.activeProjectName = projectName;
 
         (async () => {
             await loadProject(projectName, store);

@@ -1,6 +1,6 @@
 import { action, computed, makeObservable, observable } from "mobx";
 
-import { API } from "./api";
+import { API } from "./api/api";
 import { File, FileCreateBody } from "./file";
 import { Tag, TagCreateBody, TagID } from "./tag";
 import { Tab, TabBody } from "./tab/tab";
