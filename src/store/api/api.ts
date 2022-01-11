@@ -1,11 +1,40 @@
-import { ApiFiles } from "./files";
-import { ApiTags } from "./tags";
+import { ApiFiles } from "./api-files";
+import { ApiTags } from "./api-tags";
+
+export type UniversalResBody = {
+    tags?: {
+        id: number;
+        createdAt?: string;
+        updatedAt?: string;
+        name?: string;
+        parentId?: null | number;
+        rank?: number;
+    }[];
+    files?: {
+        id: number;
+        createdAt?: string;
+        updatedAt?: string;
+        path?: string;
+        description?: string;
+        tagsIds?: number[];
+    }[];
+    removedTagsIds?: number[];
+    removedFilesIds?: number[];
+};
+
+type ApiOpts = {
+    onResponse: (data: UniversalResBody) => void;
+};
 
 export class API {
     readonly API_BASE_URL = 'http://localhost:3060';
 
     readonly tags = new ApiTags(this);
     readonly files = new ApiFiles(this);
+
+    constructor(readonly opts: ApiOpts) {
+
+    }
 
     private getProjectAssetsUrl(projectName: string) {
         return `${this.API_BASE_URL}/${projectName}/assets`;

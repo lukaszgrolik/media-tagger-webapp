@@ -33,7 +33,7 @@ export class ApiTags {
         });
         const data = await res.json();
 
-        // @todo upsert to store
+        this.api.opts.onResponse(data);
     }
 
     // async updateTag(projectName: string, tagId: TagID, body: {name: string; parentId: TagID | null}) {
@@ -50,7 +50,7 @@ export class ApiTags {
         });
         const data = await res.json();
 
-        // @todo upsert to store
+        this.api.opts.onResponse(data);
     }
 
     async deleteTags(projectName: string, tagsIds: TagID[]) {
@@ -63,6 +63,6 @@ export class ApiTags {
         });
         const data = await res.json();
 
-        // @todo upsert to store
+        this.api.opts.onResponse(data);
     }
 }

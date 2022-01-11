@@ -12,6 +12,11 @@ export interface FileCreateBody {
     readonly tagsIds: TagID[];
 }
 
+export interface FileUpdateBody {
+    readonly description?: string;
+    readonly tagsIds?: TagID[];
+}
+
 export class File {
     readonly id: number;
     path: string;
@@ -32,7 +37,20 @@ export class File {
 
             tagsIds: observable,
             tags: computed,
+            setTags: action,
+
+            update: action,
         });
+    }
+
+    update(body: FileUpdateBody) {
+        if (body.description !== undefined) this.description = body.description;
+        if (body.tagsIds !== undefined) this.setTags(body.tagsIds);
+    }
+
+    setTags(ids: number[]) {
+        this.tagsIds.length = 0;
+        this.tagsIds.push(...ids);
     }
 
     get filePath() {

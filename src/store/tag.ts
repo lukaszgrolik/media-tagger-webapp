@@ -8,17 +8,25 @@ export interface TagCreateBody {
     readonly id: TagID;
     readonly name: string;
     readonly parentId: number | null;
+    readonly rank: number;
+}
+export interface TagUpdateBody {
+    readonly name?: string;
+    readonly parentId?: number | null;
+    readonly rank?: number;
 }
 
 export class Tag {
     readonly id: number;
     name: string;
     parentId: number | null;
+    rank: number;
 
     constructor(readonly store: Store, body: TagCreateBody) {
         this.id = body.id;
         this.name = body.name;
         this.parentId = body.parentId || null;
+        this.rank = body.rank;
 
         makeObservable(this, {
             name: observable,
@@ -32,7 +40,15 @@ export class Tag {
             children: computed,
 
             files: computed,
+
+            update: action,
         });
+    }
+
+    update(body: TagUpdateBody) {
+        if (body.name !== undefined) this.name === body.name;
+        if (body.parentId !== undefined) this.parentId === body.parentId;
+        if (body.rank !== undefined) this.rank === body.rank;
     }
 
     // setName(name: string) {

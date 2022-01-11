@@ -53,9 +53,19 @@ export const MediaItem: React.FC<{ store: Store.Store; projectName: string; file
             return store.api.getProjectFileThumbnailUrl(projectName, filePath.path, thumbSize);
         }
     })();
+    const isSelected = store.activeTab.selectedFilePaths.includes(filePath);
 
     return (
-        <div style={{ position: 'relative' }}>
+        <div
+            style={{
+                position: 'relative',
+                outline: isSelected ? '5px solid tomato' : ''
+            }}
+            onClick={() => {
+                console.log('click')
+                store.activeTab.toggleFilePath(filePath);
+            }}
+        >
             <div title={filePath.mtime}>
                 {
                     filePath.fileType === 'video'

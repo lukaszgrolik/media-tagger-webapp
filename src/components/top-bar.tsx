@@ -9,7 +9,7 @@ import * as Store from '../store/store';
 const Wrapper = styled.div`
     background-color: #eee;
     grid-area: top-bar;
-    padding: 2em;
+    padding: 1em;
 `;
 const SettingsBlock = styled.div`
     display: flex;
@@ -25,7 +25,7 @@ export const TopBar: React.FC<{ store: Store.Store }> = observer(({ store }) => 
     return (
         <Wrapper>
             <div>
-                <ul style={{ display: 'flex', listStyle: 'none' }}>
+                <ul style={{ display: 'flex', listStyle: 'none', padding: 0, margin: 0 }}>
                     {
                         // ['gallery', 'gallery', 'list']
                         store.tabs.map((tab, i) => {
@@ -134,6 +134,19 @@ export const TopBar: React.FC<{ store: Store.Store }> = observer(({ store }) => 
                         }}
                     />
                 </form>
+
+                <div style={{ display: 'flex' }}>
+                    <div>{tab.selectedFilePaths.length} files selected</div>
+
+                    <div>
+                        <button
+                            onClick={() => {
+                                tab.unselectAllFilePaths();
+                            }}
+                            disabled={tab.selectedFilePaths.length === 0}
+                        >unselect</button>
+                    </div>
+                </div>
             </SettingsBlock>
         </Wrapper>
     );
