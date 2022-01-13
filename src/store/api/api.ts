@@ -40,12 +40,20 @@ export class API {
         return `${this.API_BASE_URL}/${projectName}/assets`;
     }
 
+    private getProjectPostersUrl(projectName: string) {
+        return `${this.API_BASE_URL}/${projectName}/posters`;
+    }
+
     private getProjectThumbnailsUrl(projectName: string) {
         return `${this.API_BASE_URL}/${projectName}/thumbnails`;
     }
 
     getProjectFileUrl(projectName: string, filePath: string) {
         return `${this.getProjectAssetsUrl(projectName)}${filePath}`;
+    }
+
+    getProjectFilePosterUrl(projectName: string, posterPath: string) {
+        return `${this.getProjectPostersUrl(projectName)}${posterPath}`;
     }
 
     getProjectFileThumbnailUrl(projectName: string, filePath: string, size: number) {

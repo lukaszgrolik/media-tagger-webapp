@@ -12,6 +12,14 @@ export class GlobalUtils {
         return this.store.activeTab.selectedFilePaths.map(fp => fp.path);
     }
 
+    filterByTags(tagsIds: number[]) {
+        this.store.activeTab.filtering.setTags(tagsIds);
+    }
+
+    filterByFileType(fileType: 'image' | 'video' | null) {
+        this.store.activeTab.filtering.setFileType(fileType);
+    }
+
     async createTags(tags: (string | {name: string; parentId?: number})[]) {
         const bodyTags = tags.map(tag => {
             if (typeof tag === 'string') return {name: tag};
@@ -63,4 +71,10 @@ export class GlobalUtils {
     // async deleteFiles(ids: number[]) {
 
     // }
+
+    async generateFilesPosters(filePaths: string[]) {
+        await this.store.api.files.generateFilesPosters(this.activeProjectName, {
+            filePaths
+        });
+    }
 }

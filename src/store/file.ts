@@ -10,6 +10,9 @@ export interface FileCreateBody {
     readonly path: string;
     readonly description: string;
     readonly tagsIds: TagID[];
+    readonly meta?: {
+        poster?: string;
+    };
 }
 
 export interface FileUpdateBody {
@@ -22,12 +25,16 @@ export class File {
     path: string;
     description: string;
     readonly tagsIds: number[] = [];
+    readonly meta: {poster: string | null | undefined};
 
     constructor(readonly store: Store, body: FileCreateBody) {
         this.id = body.id;
         this.path = body.path;
         this.description = body.description || '';
         this.tagsIds = body.tagsIds;
+        this.meta = {
+            poster: body.meta?.poster,
+        };
 
         makeObservable(this, {
             path: observable,
@@ -38,6 +45,8 @@ export class File {
             tagsIds: observable,
             tags: computed,
             setTags: action,
+
+            meta: observable,
 
             update: action,
         });

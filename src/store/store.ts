@@ -63,6 +63,19 @@ export class Store {
         });
     }
 
+    // folders() {
+    //     type Folder = { name: string; folders: Folder[] };
+    //     const folders: Folder[] = [];
+
+    //     this.filePaths.map(fp => {
+    //         const dirs = fp.path.replace('/', '').split('/').slice(0, -1);
+
+    //         dirs.forEach(dir => {
+    //             folders.push
+    //         })
+    //     });
+    // }
+
     setFilePaths(files: FilePathBody[]) {
         this.filePaths.length = 0;
         this.filePaths.push(...files.map(f => new FilePath(this, f)));

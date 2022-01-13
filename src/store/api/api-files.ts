@@ -17,6 +17,10 @@ type UpdateFilesTagsBody = {
     newTags?: (string | { name: string; parentId: TagID })[]
 };
 
+type GenerateFilesPostersBody = {
+    filePaths: string[];
+};
+
 export class ApiFiles {
     constructor(readonly api: API) {
 
@@ -51,4 +55,17 @@ export class ApiFiles {
     // async deleteFiles(projectName: string, filePaths: string[]) {
 
     // }
+
+    async generateFilesPosters(projectName: string, body: GenerateFilesPostersBody) {
+        const res = await fetch(`${this.api.API_BASE_URL}/${projectName}/files/posters/generate`, {
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body),
+        });
+        const data = await res.json();
+
+        this.api.opts.onResponse(data);
+    }
 }

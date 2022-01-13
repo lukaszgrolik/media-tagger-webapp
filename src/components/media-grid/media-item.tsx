@@ -53,6 +53,13 @@ export const MediaItem: React.FC<{ store: Store.Store; projectName: string; file
             return store.api.getProjectFileThumbnailUrl(projectName, filePath.path, thumbSize);
         }
     })();
+    const posterUrl = (() => {
+        if (!filePath.file || !filePath.file.meta.poster) return;
+
+        const url = store.api.getProjectFilePosterUrl(projectName, filePath.file.meta.poster);
+
+        return url;
+    })();
     const isSelected = store.activeTab.selectedFilePaths.includes(filePath);
 
     return (
@@ -74,7 +81,9 @@ export const MediaItem: React.FC<{ store: Store.Store; projectName: string; file
                             width={tab.config.fileHeight * 16 / 9}
                             height={tab.config.fileHeight}
                             controls
+                            muted={true}
                             preload="none"
+                            poster={posterUrl}
                             style={{ display: 'block', backgroundColor: 'black' }}
                         >
                             <source src={assetUrl} type="video/mp4" />
