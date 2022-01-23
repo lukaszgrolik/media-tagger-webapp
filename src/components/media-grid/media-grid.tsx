@@ -36,6 +36,7 @@ const MediaList = styled.ul<{width: number; height: number}>`
 
 export const MediaGrid: React.FC<{ store: Store.Store; projectName: string; }> = observer(({store, projectName}) => {
     const tab = store.activeTab;
+    if (!tab) return null;
 
     return (
         <Wrapper>

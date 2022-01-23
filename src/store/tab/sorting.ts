@@ -49,8 +49,17 @@ export class Sorting {
         });
     }
 
-    setSorting(field: SortingField, asc: boolean) {
-        this.field = field;
-        this.asc = asc;
+    async setSorting(field: SortingField, asc: boolean) {
+        await this.store.updateActiveTab({
+            sorting: {
+                field,
+                asc,
+            },
+        });
+
+        action(() => {
+            this.field = field;
+            this.asc = asc;
+        })();
     }
 }

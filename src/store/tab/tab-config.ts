@@ -24,9 +24,17 @@ export class Config {
         });
     }
 
-    setFileHeight(value: number) {
+    async setFileHeight(value: number) {
         if (!value) return;
 
-        this.fileHeight = value;
+        await this.store.updateActiveTab({
+            config: {
+                fileHeight: value,
+            },
+        });
+
+        action(() => {
+            this.fileHeight = value;
+        })();
     }
 }

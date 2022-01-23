@@ -1,4 +1,4 @@
-import { action, computed, makeObservable, observable } from "mobx";
+import { action, computed, makeObservable, observable, reaction } from "mobx";
 
 import { Store } from "../store";
 import { TagID } from "../tag";
@@ -31,6 +31,12 @@ export class Pagination {
             filePaths: computed,
             pagesCount: computed,
         });
+
+        reaction(() => this.pagesCount, pagesCount => {
+            if (this.currentPage > pagesCount - 1) {
+                this.setCurrentPage(pagesCount - 1);
+            }
+        });
     }
 
     get filePaths() {
@@ -44,20 +50,38 @@ export class Pagination {
         return Math.ceil(this.tab.filtering.filePaths.length / this.perPage);
     }
 
-    setPerPage(value: number) {
+    async setPerPage(value: number) {
         if (!value) return;
 
         const max = 100;
-        this.perPage = Math.min(value, max);
-
         if (value > max) console.warn(`too big value: ${value} - set to ${max} instead`);
+
+        const validValue = Math.min(value, max);
+
+        await this.store.updateActiveTab({
+            pagination: {
+                perPage: validValue,
+            },
+        });
+
+        action(() => {
+            this.perPage = validValue;
+        })();
     }
 
-    setCurrentPage(value: number) {
+    async setCurrentPage(value: number) {
         if (value < 0) return;
         if (value >= this.pagesCount) return;
 
-        this.currentPage = value;
+        await this.store.updateActiveTab({
+            pagination: {
+                currentPage: value,
+            },
+        });
+
+        action(() => {
+            this.currentPage = value;
+        })();
     }
 
     get isFirstPage() {

@@ -11,7 +11,7 @@ export const TagsBlock: React.FC<{ store: Store.Store; tags: Store.Tag[] }> = ob
             <ul style={{padding: 0, listStyle: 'none', margin: 0}}>
                 {
                     tags.slice().sort((a, b) => a.name.localeCompare(b.name)).map(tag => {
-                        const isFilteredByTag = store.activeTab.filtering.tagsIds.includes(tag.id);
+                        const isFilteredByTag = !!store.activeTab?.filtering.tagsIds.includes(tag.id);
 
                         return (
                             <li key={tag.id}>
@@ -20,7 +20,7 @@ export const TagsBlock: React.FC<{ store: Store.Store; tags: Store.Tag[] }> = ob
                                         title={`#${tag.id}`}
                                         style={{ fontWeight: isFilteredByTag ? 'bold' : 'normal' }}
                                         onClick={() => {
-                                            store.addTab({
+                                            store.createTab({
                                                 filtering: { tagsIds: [tag.id] }
                                             });
                                         }}

@@ -66,6 +66,31 @@ const fetchDB = async (projectName: string, store: Store.Store) => {
     store.setFiles(db.files);
 };
 
+async function loadLocalStorageData(store: Store.Store) {
+    store.opts.localStorageAdapter.createIfDoesNotExist(['projects', 'tabs']);
+
+    const data = await store.opts.localStorageDb.read();
+
+    if (data.tabs.length) {
+        store.setTabs(data.tabs);
+    }
+    else {
+        await store.createEmptyTab();
+    }
+
+    if (!data.projects.length) {
+        await store.opts.localStorageDb.insert('projects', {});
+    }
+    else {
+        if (data.projects[0].activeTabId) {
+            store.setActiveTabId(data.projects[0].activeTabId);
+        }
+        else {
+            store.setActiveTabId(store.tabs[0].id);
+        }
+    }
+}
+
 export const MainView: React.FC<{store: Store.Store}> = observer(({store}) => {
     const [loaded, setLoaded] = React.useState(false);
     const {projectName} = useParams<{projectName: string}>();
@@ -79,6 +104,8 @@ export const MainView: React.FC<{store: Store.Store}> = observer(({store}) => {
             await loadProject(projectName, store);
 
             setLoaded(true);
+
+            loadLocalStorageData(store);
         })();
     }, []);
 

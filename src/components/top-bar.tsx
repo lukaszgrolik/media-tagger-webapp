@@ -5,6 +5,7 @@ import { observer } from "mobx-react-lite";
 import styled from '@emotion/styled';
 
 import * as Store from '../store/store';
+import { TabsBlock } from './tabs-block';
 
 const Wrapper = styled.div`
     background-color: #eee;
@@ -21,30 +22,12 @@ const SettingsBlock = styled.div`
 
 export const TopBar: React.FC<{ store: Store.Store }> = observer(({ store }) => {
     const tab = store.activeTab;
+    if (!tab) return null;
 
     return (
         <Wrapper>
             <div>
-                <ul style={{ display: 'flex', listStyle: 'none', padding: 0, margin: 0 }}>
-                    {
-                        // ['gallery', 'gallery', 'list']
-                        store.tabs.map((tab, i) => {
-                            return (
-                                <li key={i}>
-                                    <button
-                                        style={{ fontWeight: store.activeTab === tab ? 'bold' : 'normal' }}
-                                        onClick={() => {
-                                            if (store.activeTab === tab) return;
-
-                                            store.setActiveTab(tab);
-                                        }}
-                                    >tab #{i} ({tab.filtering.filePaths.length})</button>
-                                </li>
-                            );
-                        })
-
-                    }
-                </ul>
+                <TabsBlock store={store} />
             </div>
 
             <SettingsBlock>

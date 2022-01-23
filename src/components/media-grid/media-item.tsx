@@ -36,6 +36,8 @@ const MediaList = styled.ul<{ width: number; height: number }>`
 
 export const MediaItem: React.FC<{ store: Store.Store; projectName: string; filePath: FilePath }> = observer(({ store, projectName, filePath }) => {
     const tab = store.activeTab;
+    if (!tab) return null;
+
     const assetUrl = store.api.getProjectFileUrl(projectName, filePath.path);
     const thumbnailUrl = (() => {
         const thumbSizes = [90, 180, 360, 720];
@@ -60,7 +62,7 @@ export const MediaItem: React.FC<{ store: Store.Store; projectName: string; file
 
         return url;
     })();
-    const isSelected = store.activeTab.selectedFilePaths.includes(filePath);
+    const isSelected = tab.selectedFilePaths.includes(filePath);
 
     return (
         <div
@@ -70,7 +72,7 @@ export const MediaItem: React.FC<{ store: Store.Store; projectName: string; file
             }}
             onClick={() => {
                 console.log('click')
-                store.activeTab.toggleFilePath(filePath);
+                tab.toggleFilePath(filePath);
             }}
         >
             <div title={filePath.mtime}>

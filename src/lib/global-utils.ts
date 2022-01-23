@@ -9,15 +9,29 @@ export class GlobalUtils {
     }
 
     getSelectedFiles(): string[] {
+        if (!this.store.activeTab) return [];
+
         return this.store.activeTab.selectedFilePaths.map(fp => fp.path);
     }
 
-    filterByTags(tagsIds: number[]) {
-        this.store.activeTab.filtering.setTags(tagsIds);
+    resetFilters() {
+        this.store.activeTab?.filtering.reset();
     }
 
     filterByFileType(fileType: 'image' | 'video' | null) {
-        this.store.activeTab.filtering.setFileType(fileType);
+        this.store.activeTab?.filtering.setFileType(fileType);
+    }
+
+    untaggedFilesOnly(val = true) {
+        this.store.activeTab?.filtering.setUntagged(val);
+    }
+
+    filterByTags(tagsIds: number[]) {
+        this.store.activeTab?.filtering.setTags(tagsIds);
+    }
+
+    omitTags(tagsIds: number[]) {
+        this.store.activeTab?.filtering.setWithoutTags(tagsIds);
     }
 
     async createTags(tags: (string | {name: string; parentId?: number})[]) {
@@ -76,5 +90,18 @@ export class GlobalUtils {
         await this.store.api.files.generateFilesPosters(this.activeProjectName, {
             filePaths
         });
+    }
+
+    getVideosWithoutPosters() {
+        return this.store.filePaths.filter(fp => {
+            return fp.path.match(/\.mp4$/) && !fp.file?.meta?.poster;
+        });
+    }
+
+    async generatePostersForVideosWithoutPosters(max: number) {
+        const files = this.getVideosWithoutPosters();
+        const filePaths = files.map(fp => fp.path).slice(0, max);
+
+        await this.generateFilesPosters(filePaths);
     }
 }
