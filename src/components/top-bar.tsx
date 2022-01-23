@@ -19,6 +19,11 @@ const SettingsBlock = styled.div`
         margin-left: 2em;
     }
 `;
+const TabsBlockWrapper = styled.div`
+    background-color: hsl(240, 10%, 90%);
+    padding: .5em;
+    padding-bottom: 0;
+`;
 
 export const TopBar: React.FC<{ store: Store.Store }> = observer(({ store }) => {
     const tab = store.activeTab;
@@ -26,9 +31,9 @@ export const TopBar: React.FC<{ store: Store.Store }> = observer(({ store }) => 
 
     return (
         <Wrapper>
-            <div>
+            <TabsBlockWrapper>
                 <TabsBlock store={store} />
-            </div>
+            </TabsBlockWrapper>
 
             <SettingsBlock>
                 <div>filtered files: {tab.filtering.filePaths.length} ({store.filePaths.length} total)</div>

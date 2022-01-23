@@ -8,7 +8,7 @@ import { css } from '@emotion/react';
 import * as Store from '../store/store';
 
 const Wrapper = styled.div`
-    background-color: hsl(240, 10%, 90%);
+
 `;
 const TabsList = styled.ul`
     display: flex;
