@@ -9,6 +9,7 @@ import * as Store from '../../store/store';
 import { MediaItem } from './media-item';
 
 const Wrapper = styled.div`
+    background: #000;
     grid-area: main-content;
     overflow: auto;
     padding: 2em;
@@ -28,7 +29,7 @@ const MediaList = styled.ul<{width: number; height: number}>`
     justify-content: center;
     margin: -1em 0 0 -1em;
 
-    li {
+    > li {
         list-style: none;
         margin: 1em 0 0 1em;
     }

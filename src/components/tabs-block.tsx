@@ -8,7 +8,7 @@ import { css } from '@emotion/react';
 import * as Store from '../store/store';
 
 const Wrapper = styled.div`
-
+    background-color: hsl(240, 10%, 90%);
 `;
 const TabsList = styled.ul`
     display: flex;
@@ -16,13 +16,14 @@ const TabsList = styled.ul`
     padding: 0;
     list-style: none;
 `;
+const hoverColor = `hsl(240, 50%, 70%)`;
 const TabButton = styled.div<{ isActive: boolean }>`
     ${props => props.isActive === false && css`cursor: pointer`};
-    background-color: ${props => props.isActive ? `rgba(255, 255, 255, .5)` : `rgba(0, 0, 0, .1)`};
+    background-color: ${props => props.isActive ? `hsl(240, 10%, 70%)` : ``};
     padding: .5em 1em;
 
     &:hover {
-        ${props => props.isActive === false && css`background-color: rgba(255, 255, 255, .1)`};
+        ${props => props.isActive === false && css`background-color: ${hoverColor}`};
     }
 `;
 const AddNewTabButton = styled.div`
@@ -30,7 +31,7 @@ const AddNewTabButton = styled.div`
     padding: .5em 1em;
 
     &:hover {
-        background-color: rgba(255, 255, 255, .25);
+        background-color: ${hoverColor};
     }
 `;
 export const TabsBlock: React.FC<{ store: Store.Store }> = observer(({ store }) => {

@@ -8,9 +8,14 @@ import * as Store from '../../store/store';
 import { TagsBlock } from './tags-block';
 
 const Wrapper = styled.div`
+    background-color: hsl(240, 15%, 15%);
+    color: #fff;
     grid-area: side-bar;
     overflow: auto;
     font-size: 14px;
+`;
+const TagsBlockWrapper = styled.div`
+    padding: 1em;
 `;
 
 export const Sidebar: React.FC<{ store: Store.Store }> = observer(({ store }) => {
@@ -34,7 +39,9 @@ export const Sidebar: React.FC<{ store: Store.Store }> = observer(({ store }) =>
                 all tags: {store.tags.length}
             </div>
 
-            <TagsBlock store={store} tags={store.topLevelTags} />
+            <TagsBlockWrapper>
+                <TagsBlock store={store} tags={store.topLevelTags} />
+            </TagsBlockWrapper>
         </Wrapper>
     );
 });

@@ -8,12 +8,12 @@ import * as Store from '../store/store';
 import { TabsBlock } from './tabs-block';
 
 const Wrapper = styled.div`
-    background-color: #eee;
     grid-area: top-bar;
-    padding: 1em;
 `;
 const SettingsBlock = styled.div`
+    background-color: hsl(240, 10%, 70%);
     display: flex;
+    padding: 1em;
 
     > * + * {
         margin-left: 2em;

@@ -9,29 +9,7 @@ import * as Store from '../../store/store';
 import { FilePath } from '../../store/file-path';
 
 const Wrapper = styled.div`
-    grid-area: main-content;
-    overflow: auto;
-    padding: 2em;
-`;
-const MediaList = styled.ul<{ width: number; height: number }>`
-    margin: 0;
-    padding: 0;
 
-    /* display: grid; */
-    /* grid-template-columns: ${(props) => `repeat(3, ${props.width}px)`}; */
-    /* grid-template-columns: ${(props) => `repeat(auto-fit, minmax(${props.width}px, 1fr))`}; */
-    /* grid-auto-rows: ${props => `${props.height}px`}; */
-    /* grid-gap: 1em 1em; */
-
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin: -1em 0 0 -1em;
-
-    li {
-        list-style: none;
-        margin: 1em 0 0 1em;
-    }
 `;
 
 export const MediaItem: React.FC<{ store: Store.Store; projectName: string; filePath: FilePath }> = observer(({ store, projectName, filePath }) => {
@@ -65,72 +43,83 @@ export const MediaItem: React.FC<{ store: Store.Store; projectName: string; file
     const isSelected = tab.selectedFilePaths.includes(filePath);
 
     return (
-        <div
-            style={{
-                position: 'relative',
-                outline: isSelected ? '5px solid tomato' : ''
-            }}
-            onClick={() => {
-                console.log('click')
-                tab.toggleFilePath(filePath);
-            }}
-        >
-            <div title={filePath.mtime}>
-                {
-                    filePath.fileType === 'video'
-                        ?
-                        <video
-                            width={tab.config.fileHeight * 16 / 9}
-                            height={tab.config.fileHeight}
-                            controls
-                            muted={true}
-                            preload="none"
-                            poster={posterUrl}
-                            style={{ display: 'block', backgroundColor: 'black' }}
-                        >
-                            <source src={assetUrl} type="video/mp4" />
-                        </video>
-                        :
-                        filePath.fileType === 'image'
+        <div>
+            <div
+                style={{
+                    position: 'relative',
+                    outline: isSelected ? '5px solid tomato' : ''
+                }}
+                onClick={() => {
+                    tab.toggleFilePath(filePath);
+                }}
+            >
+                <div title={filePath.mtime}>
+                    {
+                        filePath.fileType === 'video'
                             ?
-                            <img
-                                // src={thumbnailUrl}
-                                src={assetUrl}
-                                alt={filePath.path}
-                                // width={tab.config.fileWidth}
+                            <video
+                                width={tab.config.fileHeight * 16 / 9}
                                 height={tab.config.fileHeight}
-                                style={{ display: 'block' }}
-                                loading="lazy"
-                            />
+                                controls
+                                muted={true}
+                                preload="none"
+                                poster={posterUrl}
+                                style={{ display: 'block', backgroundColor: 'black' }}
+                            >
+                                <source src={assetUrl} type="video/mp4" />
+                            </video>
                             :
-                            <div>
-                                <div>{assetUrl}</div>
-                                <div>unsupported file extension:  {filePath.fileExt}</div>
-                            </div>
+                            filePath.fileType === 'image'
+                                ?
+                                <img
+                                    // src={thumbnailUrl}
+                                    src={assetUrl}
+                                    alt={filePath.path}
+                                    // width={tab.config.fileWidth}
+                                    height={tab.config.fileHeight}
+                                    style={{ display: 'block' }}
+                                    loading="lazy"
+                                />
+                                :
+                                <div>
+                                    <div>{assetUrl}</div>
+                                    <div>unsupported file extension:  {filePath.fileExt}</div>
+                                </div>
+                    }
+                </div>
+                <div style={{ position: 'absolute', left: 0, bottom: 0, backgroundColor: 'rgba(255, 255, 255, .75)', fontSize: 14 }}>
+                    <a href={assetUrl} title={filePath.path}>link</a>
+                </div>
+                <div style={{ position: 'absolute', right: 0, bottom: 0, backgroundColor: 'rgba(255, 255, 255, .75)', fontSize: 14 }}>
+                    {filePath.sizeString}
+                </div>
+                {
+                    filePath.file
+                    &&
+                    <div style={{ position: 'absolute', left: 0, top: 0, backgroundColor: 'rgba(255, 255, 255, .75)', fontSize: 14 }}>#{filePath.file.id}</div>
+                }
+                {
+                    filePath.file?.tags.length
+                    &&
+                    <div style={{ position: 'absolute', right: 0, top: 0, backgroundColor: 'rgba(255, 255, 255, .75)', fontSize: 14 }}>
+                        <span title={`${filePath.file.tags.map(t => t.pathString).join('\n')}`}>{filePath.file.tags.length} tags</span>
+                    </div>
                 }
             </div>
 
-            <div style={{ position: 'absolute', left: 0, bottom: 0, backgroundColor: 'rgba(255, 255, 255, .75)', fontSize: 14 }}>
-                <a href={assetUrl} title={filePath.path}>link</a>
+            <div style={{backgroundColor: '#eee'}}>
+                <ul>
+                    {
+                        filePath.file?.tags.map(tag => {
+                            return (
+                                <li key={tag.id}>
+                                    <div>{tag.name}</div>
+                                </li>
+                            );
+                        })
+                    }
+                </ul>
             </div>
-
-            <div style={{ position: 'absolute', right: 0, bottom: 0, backgroundColor: 'rgba(255, 255, 255, .75)', fontSize: 14 }}>
-                {filePath.sizeString}
-            </div>
-
-            {
-                filePath.file
-                &&
-                <div style={{ position: 'absolute', left: 0, top: 0, backgroundColor: 'rgba(255, 255, 255, .75)', fontSize: 14 }}>#{filePath.file.id}</div>
-            }
-
-            {
-                filePath.file?.tags.length
-                &&
-                <div style={{ position: 'absolute', right: 0, top: 0, backgroundColor: 'rgba(255, 255, 255, .75)', fontSize: 14 }}>
-                    <span title={`${filePath.file.tags.map(t => t.pathString).join('\n')}`}>{filePath.file.tags.length} tags</span>
-                </div>
-            }
         </div>
     );
 });
