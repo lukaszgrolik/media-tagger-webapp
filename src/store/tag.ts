@@ -9,11 +9,13 @@ export interface TagCreateBody {
     readonly name: string;
     readonly parentId: number | null;
     readonly rank: number;
+    readonly color?: string;
 }
 export interface TagUpdateBody {
     readonly name?: string;
     readonly parentId?: number | null;
     readonly rank?: number;
+    readonly color?: string;
 }
 
 export class Tag {
@@ -21,12 +23,14 @@ export class Tag {
     name: string;
     parentId: number | null;
     rank: number;
+    color: string | undefined;
 
     constructor(readonly store: Store, body: TagCreateBody) {
         this.id = body.id;
         this.name = body.name;
         this.parentId = body.parentId || null;
         this.rank = body.rank;
+        this.color = body.color;
 
         makeObservable(this, {
             name: observable,
@@ -38,6 +42,8 @@ export class Tag {
             ancestors: computed,
             path: computed,
             children: computed,
+
+            color: observable,
 
             files: computed,
 

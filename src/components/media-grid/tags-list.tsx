@@ -30,7 +30,8 @@ const List = styled.ul`
 const TagBlock = styled.div`
     /* background-color: coral; */
     color: hsla(0, 0%, 0%, .9);
-    padding: .25em .5em;
+    padding: .1em .25em;
+    border-radius: .1em;
 `;
 
 export const TagsList: React.FC<{ store: Store.Store; filePath: FilePath }> = observer(({ store, filePath }) => {
@@ -45,13 +46,15 @@ export const TagsList: React.FC<{ store: Store.Store; filePath: FilePath }> = ob
             <List>
                 {
                     filePath.file?.tags.map(tag => {
-                        const index = Math.floor(Math.random() * hues.length);
-                        const hue = hues[index];
+                        // const index = Math.floor(Math.random() * hues.length);
+                        // const hue = hues[index];
+                        // const color = `hsl(${hue}, 50%, 50%)`;
+                        const color = tag.color || '#fff';
 
                         return (
                             <li key={tag.id}>
                                 <TagBlock
-                                    style={{backgroundColor: `hsl(${hue}, 50%, 50%)`}}
+                                    style={{backgroundColor: color}}
                                 >{tag.name}</TagBlock>
                             </li>
                         );
