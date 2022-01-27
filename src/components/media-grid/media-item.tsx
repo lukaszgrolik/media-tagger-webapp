@@ -7,6 +7,7 @@ import styled from '@emotion/styled';
 import * as fileParser from '../../lib/file-parser';
 import * as Store from '../../store/store';
 import { FilePath } from '../../store/file-path';
+import { TagsList } from './tags-list';
 
 const Wrapper = styled.div`
 
@@ -107,18 +108,9 @@ export const MediaItem: React.FC<{ store: Store.Store; projectName: string; file
                 }
             </div>
 
-            <div style={{backgroundColor: '#eee'}}>
-                <ul>
-                    {
-                        filePath.file?.tags.map(tag => {
-                            return (
-                                <li key={tag.id}>
-                                    <div>{tag.name}</div>
-                                </li>
-                            );
-                        })
-                    }
-                </ul>
+            {/* <div style={{backgroundColor: '#fff'}}> */}
+            <div style={{marginTop: '.5em'}}>
+                <TagsList store={store} filePath={filePath} />
             </div>
         </div>
     );
