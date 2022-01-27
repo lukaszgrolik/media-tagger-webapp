@@ -63,12 +63,14 @@ export class File {
     }
 
     get filePath() {
-        return this.store.filePaths.find(fp => fp.path === this.path);
+        // return this.store.filePaths.find(fp => fp.path === this.path);
+        return this.store.filePaths_indexedBy_path.get(this.path);
     }
 
     get tags() {
         return this.tagsIds.map(tagId => {
-            return this.store.tags.find(t => t.id === tagId);
+            // return this.store.tags.find(t => t.id === tagId);
+            return this.store.tags_indexedBy_id.get(tagId);
         }).filter(t => t) as Tag[];
     }
 }

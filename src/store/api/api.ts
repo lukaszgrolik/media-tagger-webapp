@@ -67,14 +67,29 @@ export class API {
     }
 
     async fetchProjects() {
-        return (await fetch(`${this.API_BASE_URL}/projects`)).json();
+        const res = await fetch(`${this.API_BASE_URL}/projects`);
+        const data = await res.json();
+
+        return data;
     }
 
     async fetchFilePaths(projectName: string) {
-        return (await fetch(`${this.API_BASE_URL}/${projectName}/files`)).json();
+        const res = await fetch(`${this.API_BASE_URL}/${projectName}/files`);
+        // const t0 = performance.now();
+        const data = await res.json();
+        // const t1 = performance.now();
+        // console.log('fetchFilePaths json', t1 - t0);
+
+        return data;
     }
 
     async fetchDB(projectName: string) {
-        return (await fetch(`${this.API_BASE_URL}/${projectName}/db`)).json();
+        const res = await fetch(`${this.API_BASE_URL}/${projectName}/db`);
+        // const t0 = performance.now();
+        const data = await res.json();
+        // const t1 = performance.now();
+        // console.log('fetchFilePaths json', t1 - t0);
+
+        return data;
     }
 }

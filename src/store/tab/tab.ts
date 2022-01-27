@@ -37,7 +37,8 @@ export class Tab {
         this.pagination = new Pagination(this.store, this, body.pagination);
 
         this.selectedFilePaths = (body.selectedFilePaths || []).map(sfp => {
-            return store.filePaths.find(fp => fp.path === sfp);
+            // return store.filePaths.find(fp => fp.path === sfp);
+            return store.filePaths_indexedBy_path.get(sfp);
         }).filter(fp => fp) as FilePath[];
 
         makeObservable(this, {

@@ -56,7 +56,10 @@ export class Tag {
     // }
 
     get parent(): Tag | null {
-        return this.store.tags.find(t => t.id === this.parentId) || null;
+        if (this.parentId === null) return null;
+
+        // return this.store.tags.find(t => t.id === this.parentId);
+        return this.store.tags_indexedBy_id.get(this.parentId) || null;
     }
 
     get ancestors(): Tag[] {

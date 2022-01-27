@@ -51,7 +51,10 @@ window.loadProject = loadProject;
 const fetchFiles = async (projectName: string, store: Store.Store) => {
     const files = await store.api.fetchFilePaths(projectName);
 
+    // const t0 = performance.now();
     store.setFilePaths(files);
+    // const t1 = performance.now();
+    // console.log(`setFilePaths`, t1 - t0);
 };
 const fetchDB = async (projectName: string, store: Store.Store) => {
     // const parsedFileData = fileParser.parseFile(TAGS_FILE);
@@ -62,8 +65,12 @@ const fetchDB = async (projectName: string, store: Store.Store) => {
 
     const db = await store.api.fetchDB(projectName);
 
+    // const t0 = performance.now();
     store.setTags(db.tags);
     store.setFiles(db.files);
+    // const t1 = performance.now();
+    // console.log(`setTags + setFiles`, t1 - t0);
+
 };
 
 async function loadLocalStorageData(store: Store.Store) {
@@ -101,7 +108,10 @@ export const MainView: React.FC<{store: Store.Store}> = observer(({store}) => {
         window.__globalUtils.activeProjectName = projectName;
 
         (async () => {
+            // const t0 = performance.now();
             await loadProject(projectName, store);
+            // const t1 = performance.now();
+            // console.log('loadProject', t1 - t0);
 
             setLoaded(true);
 

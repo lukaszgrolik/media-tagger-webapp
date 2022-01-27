@@ -67,7 +67,8 @@ export class FilePath {
     }
 
     get file() {
-        return this.store.files.find(f => f.path === this.path);
+        // return this.store.files.find(f => f.path === this.path);
+        return this.store.files_indexedBy_path.get(this.path);
     }
 
     get sizeString() {

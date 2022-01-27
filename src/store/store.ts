@@ -20,8 +20,14 @@ export class Store {
     readonly api;
 
     readonly filePaths: FilePath[] = [];
+    readonly filePaths_indexedBy_path = new Map<string, FilePath>();
+
     readonly tags: Tag[] = [];
+    readonly tags_indexedBy_id = new Map<number, Tag>();
+
     readonly files: File[] = [];
+    // readonly files_indexedBy_id = new Map<number, File>();
+    readonly files_indexedBy_path = new Map<string, File>();
 
     readonly tabs: Tab[] = [
         // new Tab(this),
@@ -50,14 +56,18 @@ export class Store {
 
         makeObservable(this, {
             filePaths: observable,
+            filePaths_indexedBy_path: observable,
             setFilePaths: action,
 
             files: observable,
+            // files_indexedBy_id: observable,
+            files_indexedBy_path: observable,
             setFiles: action,
             upsertFiles: action,
             removeFiles: action,
 
             tags: observable,
+            tags_indexedBy_id: observable,
             setTags: action,
             upsertTags: action,
             removeTags: action,
@@ -87,9 +97,15 @@ export class Store {
     //     });
     // }
 
-    setFilePaths(files: FilePathBody[]) {
+    setFilePaths(filePaths: FilePathBody[]) {
         this.filePaths.length = 0;
-        this.filePaths.push(...files.map(f => new FilePath(this, f)));
+        this.filePaths.push(...filePaths.map(f => new FilePath(this, f)));
+
+        this.filePaths_indexedBy_path.clear();
+        for (let i = 0; i < this.filePaths.length; i++) {
+            const filePath = this.filePaths[i];
+            this.filePaths_indexedBy_path.set(filePath.path, filePath);
+        }
     }
 
     //
@@ -99,6 +115,12 @@ export class Store {
     setTags(tags: TagCreateBody[]) {
         this.tags.length = 0;
         this.tags.push(...tags.map(t => new Tag(this, t)))
+
+        this.tags_indexedBy_id.clear();
+        for (let i = 0; i < this.tags.length; i++) {
+            const tag = this.tags[i];
+            this.tags_indexedBy_id.set(tag.id, tag);
+        }
     }
 
     upsertTags(bodyArr: ({id: TagID} & (TagCreateBody | TagUpdateBody))[]) {
@@ -116,6 +138,11 @@ export class Store {
         });
 
         this.tags.push(...newTags);
+
+        for (let i = 0; i < newTags.length; i++) {
+            const tag = newTags[i];
+            this.tags_indexedBy_id.set(tag.id, tag);
+        }
     }
 
     removeTags(ids: number[]) {
@@ -138,9 +165,15 @@ export class Store {
     //
     //
 
-    setFiles(tags: FileCreateBody[]) {
+    setFiles(files: FileCreateBody[]) {
         this.files.length = 0;
-        this.files.push(...tags.map(t => new File(this, t)))
+        this.files.push(...files.map(t => new File(this, t)));
+
+        this.files_indexedBy_path.clear();
+        for (let i = 0; i < this.files.length; i++) {
+            const file = this.files[i];
+            this.files_indexedBy_path.set(file.path, file);
+        }
     }
 
     upsertFiles(bodyArr: ({id: FileID} & (FileCreateBody | FileUpdateBody))[]) {
@@ -158,6 +191,11 @@ export class Store {
         });
 
         this.files.push(...newFiles);
+
+        for (let i = 0; i < newFiles.length; i++) {
+            const file = newFiles[i];
+            this.files_indexedBy_path.set(file.path, file);
+        }
     }
 
     removeFiles(ids: number[]) {
