@@ -7,9 +7,12 @@ import styled from '@emotion/styled';
 import * as fileParser from '../../lib/file-parser';
 import * as Store from '../../store/store';
 import { MediaItem } from './media-item';
+import { repLinGradient } from '../../lib/utils';
 
 const Wrapper = styled.div`
-    background: #000;
+    /* background: #000; */
+    /* background: ${repLinGradient(-45, '#373737', '#333', `1em`, `5em`)}; */
+    background: ${repLinGradient(-45, '#f7f7f7', '#eee', `1em`, `5em`)};
     grid-area: main-content;
     overflow: auto;
     padding: 2em;

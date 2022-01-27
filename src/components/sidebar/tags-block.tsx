@@ -5,6 +5,14 @@ import styled from '@emotion/styled';
 
 import * as Store from '../../store/store';
 
+const TagBlock = styled.div`
+    display: flex;
+    align-items: baseline;
+
+    > * + * {
+        margin-left: .5em;
+    }
+`;
 const Bullet = styled.div<{tag: Store.Tag}>`
     display: inline-block;
     background-color: ${props => props.tag.color || '#fff'};
@@ -23,7 +31,7 @@ export const TagsBlock: React.FC<{ store: Store.Store; tags: Store.Tag[] }> = ob
 
                         return (
                             <li key={tag.id}>
-                                <div>
+                                <TagBlock>
                                     <Bullet tag={tag} />
                                     <span style={{color: 'grey'}}>#{tag.id}</span> <span
                                         title={`#${tag.id}`}
@@ -34,7 +42,7 @@ export const TagsBlock: React.FC<{ store: Store.Store; tags: Store.Tag[] }> = ob
                                             });
                                         }}
                                     >{tag.name}</span> <span style={{color: 'grey'}}>({tag.files.length} files)</span>
-                                </div>
+                                </TagBlock>
 
                                 {
                                     tag.children.length > 0

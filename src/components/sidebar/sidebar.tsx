@@ -6,6 +6,7 @@ import styled from '@emotion/styled';
 
 import * as Store from '../../store/store';
 import { TagsBlock } from './tags-block';
+import { repLinGradient } from '../../lib/utils';
 
 const Wrapper = styled.div`
     background-color: hsl(240, 15%, 15%);
@@ -14,8 +15,13 @@ const Wrapper = styled.div`
     overflow: auto;
     font-size: 14px;
 `;
+const lineHeight = 1.5;
 const TagsBlockWrapper = styled.div`
-    padding: 1em;
+    background: ${repLinGradient(0, 'transparent', 'rgba(255, 255, 255, .025)', `${lineHeight}em`, `${2 * lineHeight}em`)};
+    color: rgba(255, 255, 255, .75);
+    font-size: .9em;
+    line-height: ${lineHeight};
+    padding: ${lineHeight}em;
 `;
 
 export const Sidebar: React.FC<{ store: Store.Store }> = observer(({ store }) => {
