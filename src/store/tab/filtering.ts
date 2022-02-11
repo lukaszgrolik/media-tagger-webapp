@@ -1,7 +1,7 @@
 import { action, computed, makeObservable, observable, reaction } from "mobx";
 
 import { Store } from "../store";
-import { TagID } from "../tag";
+import { Tag, TagID } from "../tag";
 
 type FileType = 'image' | 'video';
 type MediaType = 'static' | 'animated';
@@ -44,11 +44,13 @@ export class Filtering {
             setUntagged: action,
 
             tagsIds: observable,
+            tags: computed,
             addTag: action,
             removeTag: action,
             setTags: action,
 
             withoutTagsIds: observable,
+            withoutTags: computed,
             setWithoutTags: action,
 
             filePaths: computed,
@@ -91,6 +93,14 @@ export class Filtering {
         this.untagged = val;
     }
 
+    getTagsByIds(tagsIds: number[]): Tag[] {
+        return tagsIds.map(tagId => this.store.tags_indexedBy_id.get(tagId)).filter(t => t) as Tag[];
+    }
+
+    get tags(): Tag[] {
+        return this.getTagsByIds(this.tagsIds);
+    }
+
     addTag(tagId: TagID) {
         this.tagsIds.push(tagId);
     }
@@ -104,6 +114,10 @@ export class Filtering {
     setTags(tagsIds: TagID[]) {
         this.tagsIds.length = 0;
         this.tagsIds.push(...tagsIds);
+    }
+
+    get withoutTags(): Tag[] {
+        return this.getTagsByIds(this.withoutTagsIds);
     }
 
     setWithoutTags(tagsIds: TagID[]) {

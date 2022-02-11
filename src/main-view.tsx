@@ -121,7 +121,7 @@ export const MainView: React.FC<{store: Store.Store}> = observer(({store}) => {
 
     return (
         <Wrapper>
-            <Sidebar store={store} />
+            <Sidebar store={store} projectName={projectName} />
 
             <TopBar store={store} />
 

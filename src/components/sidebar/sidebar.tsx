@@ -13,18 +13,20 @@ const Wrapper = styled.div`
     color: #fff;
     grid-area: side-bar;
     overflow: auto;
+    min-width: 350px;
     font-size: 14px;
 `;
-const lineHeight = 1.5;
+const lineHeight = 2;
 const TagsBlockWrapper = styled.div`
     background: ${repLinGradient(0, 'transparent', 'rgba(255, 255, 255, .025)', `${lineHeight}em`, `${2 * lineHeight}em`)};
     color: rgba(255, 255, 255, .75);
     font-size: .9em;
     line-height: ${lineHeight};
     padding: ${lineHeight}em;
+    padding-left: ${lineHeight / 2}em;
 `;
 
-export const Sidebar: React.FC<{ store: Store.Store }> = observer(({ store }) => {
+export const Sidebar: React.FC<{ store: Store.Store; projectName: string }> = observer(({ store, projectName }) => {
     const taggedFiles = store.files.filter(f => f.tagsIds.length !== 0);
     const nonTaggedFiles = store.files.filter(f => f.tagsIds.length === 0);
     const filesWithDescription = store.files.filter(f => f.description);
@@ -46,7 +48,7 @@ export const Sidebar: React.FC<{ store: Store.Store }> = observer(({ store }) =>
             </div>
 
             <TagsBlockWrapper>
-                <TagsBlock store={store} tags={store.topLevelTags} />
+                <TagsBlock store={store} tags={store.topLevelTags} projectName={projectName} />
             </TagsBlockWrapper>
         </Wrapper>
     );
