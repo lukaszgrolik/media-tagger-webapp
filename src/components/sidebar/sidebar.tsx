@@ -18,7 +18,7 @@ const Wrapper = styled.div`
 `;
 const lineHeight = 2;
 const TagsBlockWrapper = styled.div`
-    background: ${repLinGradient(0, 'transparent', 'rgba(255, 255, 255, .025)', `${lineHeight}em`, `${2 * lineHeight}em`)};
+    background: ${repLinGradient(180, 'transparent', 'rgba(255, 255, 255, .025)', `${lineHeight}em`, `${2 * lineHeight}em`)};
     color: rgba(255, 255, 255, .75);
     font-size: .9em;
     line-height: ${lineHeight};
