@@ -11,6 +11,12 @@ export interface FilePathBody {
     readonly height: number;
 }
 
+export interface DateObj {
+    year: number;
+    month: number;
+    day: number;
+}
+
 export class FilePath {
     readonly path: string;
     readonly dir: string;
@@ -20,6 +26,7 @@ export class FilePath {
 
     readonly ctime: string;
     readonly mtime: string;
+    readonly mtimeDate: DateObj | null;
     readonly size: number;
     readonly width: number;
     readonly height: number;
@@ -45,6 +52,7 @@ export class FilePath {
 
         this.ctime = body.ctime;
         this.mtime = body.mtime;
+        this.mtimeDate = this.getDate(this.mtime);
         this.size = body.size;
         this.width = body.width;
         this.height = body.height;
@@ -64,6 +72,18 @@ export class FilePath {
         makeObservable(this, {
             file: computed,
         });
+    }
+
+    getDate(dateStr: string): DateObj | null {
+        const m = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})/)
+
+        if (!m) return null;
+
+        const year = parseInt(m[1]);
+        const month = parseInt(m[2]);
+        const day = parseInt(m[3]);
+
+        return {year, month, day};
     }
 
     get file() {
