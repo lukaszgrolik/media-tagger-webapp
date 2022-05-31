@@ -21,7 +21,7 @@ export class FilePath {
 
     readonly ctime: string;
     readonly mtime: string;
-    readonly mtimeDate: DateTime | null;
+    readonly mtimeDate: DateTime;
     readonly size: number;
     readonly width: number;
     readonly height: number;

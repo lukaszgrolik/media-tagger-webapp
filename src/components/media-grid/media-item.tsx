@@ -54,7 +54,7 @@ export const MediaItem: React.FC<{ store: Store.Store; projectName: string; file
                     tab.toggleFilePath(filePath);
                 }}
             >
-                <div title={filePath.mtime}>
+                <div title={filePath.mtimeDate.toFormat('yyyy-MM-dd HH:mm')}>
                     {
                         filePath.fileType === 'video'
                             ?
