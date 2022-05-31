@@ -108,7 +108,7 @@ export const TabsBlock: React.FC<{ store: Store.Store }> = observer(({ store }) 
                                             onClick={e => {
                                                 e.stopPropagation();
 
-                                                console.log('close tab');
+                                                store.removeTab(tab.id);
                                             }}
                                         >x</TabCloseButton>
                                     </TabButton>

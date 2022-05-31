@@ -77,6 +77,7 @@ export class Store {
             setTabs: action,
             createTab: action,
             createEmptyTab: action,
+            removeTab: action,
 
             activeTabId: observable,
             setActiveTabId: action,
@@ -252,12 +253,50 @@ export class Store {
         await this.updateTab(this.activeTabId, body);
     }
 
+    async removeTab(tabId: number) {
+        if (this.tabs.length === 1) return;
+
+        const tab = this.tabs.find(t => t.id == tabId);
+        if (!tab) {
+            throw new Error(`tab to remove does not exist (id=${tabId})`);
+        }
+        else {
+            if (tabId === this.activeTabId) {
+                this.setActiveTabId(this.tabs[0].id);
+            }
+
+            await this.opts.localStorageDb.delete('tabs', tabId);
+
+            const index = this.tabs.indexOf(tab);
+
+            action(() => {
+                this.tabs.splice(index, 1);
+            })();
+        }
+    }
+
     //
     //
     //
 
     setActiveTabId(tabId: number | undefined) {
-        this.activeTabId = tabId;
+        if (!tabId) {
+            this.activeTabId = undefined;
+        }
+        else {
+            const tab = this.tabs.find(t => t.id === tabId);
+            if (!tab) {
+                if (this.tabs.length === 0) {
+                    this.createEmptyTab();
+                }
+                else {
+                    this.activeTabId = this.tabs[0].id;
+                }
+            }
+            else {
+                this.activeTabId = tabId;
+            }
+        }
     }
 
     get activeTab() {
