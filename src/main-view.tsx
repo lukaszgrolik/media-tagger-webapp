@@ -9,7 +9,7 @@ import * as Store from './store/store';
 import { GlobalUtils } from './lib/global-utils';
 import { MediaGrid } from './components/media-grid/media-grid';
 import { Sidebar } from './components/sidebar/sidebar';
-import { TopBar } from './components/top-bar';
+import { TopBar } from './components/top-bar/top-bar';
 
 declare var TAGS_FILE: string;
 declare var window: {
