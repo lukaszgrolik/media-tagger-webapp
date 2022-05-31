@@ -41,6 +41,8 @@ export class Store {
         //     filtering: {tagsIds: [11]},
         // }),
     ];
+
+    activeProjectName: string = ''; // once set, should never be empty
     activeTabId: number | undefined = undefined;
 
     constructor(readonly opts: Opts) {
@@ -78,6 +80,9 @@ export class Store {
             createTab: action,
             createEmptyTab: action,
             removeTab: action,
+
+            activeProjectName: observable,
+            setActiveProjectName: action,
 
             activeTabId: observable,
             setActiveTabId: action,
@@ -225,8 +230,11 @@ export class Store {
         this.tabs.push(...tabs);
     }
 
-    async createTab(body: Omit<TabCreateBody, 'id'>) {
-        const res = await this.opts.localStorageDb.insert('tabs', body);
+    async createTab(body: Omit<TabCreateBody, 'id' | 'projectName'>) {
+        const res = await this.opts.localStorageDb.insert('tabs', {
+            ...body,
+            projectName: this.activeProjectName,
+        });
 
         const tab = new Tab(this, res);
 
@@ -278,6 +286,14 @@ export class Store {
     //
     //
     //
+
+    setActiveProjectName(name: string) {
+        if (this.activeProjectName) {
+            throw new Error(`project name is already set ("${name}")`);
+        }
+
+        this.activeProjectName = name;
+    }
 
     setActiveTabId(tabId: number | undefined) {
         if (!tabId) {

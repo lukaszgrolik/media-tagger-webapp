@@ -18,6 +18,7 @@ type Tab = {
     id: number;
     createdAt: string;
     updatedAt: string;
+    projectName: string;
     config?: TabConfig;
     filtering?: Filtering;
     sorting?: Sorting;

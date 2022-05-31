@@ -73,13 +73,14 @@ const fetchDB = async (projectName: string, store: Store.Store) => {
 
 };
 
-async function loadLocalStorageData(store: Store.Store) {
+async function loadLocalStorageData(store: Store.Store, projectName: string) {
     store.opts.localStorageAdapter.createIfDoesNotExist(['projects', 'tabs']);
 
     const data = await store.opts.localStorageDb.read();
 
     if (data.tabs.length) {
-        store.setTabs(data.tabs);
+        const projectTabs = data.tabs.filter(t => t.projectName === projectName);
+        store.setTabs(projectTabs);
     }
     else {
         await store.createEmptyTab();
@@ -105,7 +106,7 @@ export const MainView: React.FC<{store: Store.Store}> = observer(({store}) => {
     React.useEffect(() => {
         document.title = `media-tagger | ${projectName}`;
 
-        window.__globalUtils.activeProjectName = projectName;
+        store.setActiveProjectName(projectName);
 
         (async () => {
             // const t0 = performance.now();
@@ -115,7 +116,7 @@ export const MainView: React.FC<{store: Store.Store}> = observer(({store}) => {
 
             setLoaded(true);
 
-            loadLocalStorageData(store);
+            loadLocalStorageData(store, projectName);
         })();
     }, []);
 

@@ -2,8 +2,6 @@ import { UpdateFilesBody } from "../store/api/api-files";
 import { Store } from "../store/store";
 
 export class GlobalUtils {
-    activeProjectName: string = '';
-
     constructor(readonly store: Store) {
 
     }
@@ -41,7 +39,7 @@ export class GlobalUtils {
             return tag;
         });
 
-        await this.store.api.tags.createTags(this.activeProjectName, {tags: bodyTags});
+        await this.store.api.tags.createTags(this.store.activeProjectName, {tags: bodyTags});
     }
 
     // async updateTags() {
@@ -49,11 +47,11 @@ export class GlobalUtils {
     // }
 
     async deleteTags(ids: number[]) {
-        await this.store.api.tags.deleteTags(this.activeProjectName, ids);
+        await this.store.api.tags.deleteTags(this.store.activeProjectName, ids);
     }
 
     async updateFiles(body: UpdateFilesBody) {
-        await this.store.api.files.updateFiles(this.activeProjectName, body);
+        await this.store.api.files.updateFiles(this.store.activeProjectName, body);
     }
 
     async addSelectedFilesTags(tagsIds: number[]) {
@@ -63,7 +61,7 @@ export class GlobalUtils {
             return;
         }
 
-        await this.store.api.files.updateFilesTags(this.activeProjectName, {
+        await this.store.api.files.updateFilesTags(this.store.activeProjectName, {
             filePaths: selFilePaths,
             addedTagsIds: tagsIds,
         });
@@ -76,7 +74,7 @@ export class GlobalUtils {
             return;
         }
 
-        await this.store.api.files.updateFilesTags(this.activeProjectName, {
+        await this.store.api.files.updateFilesTags(this.store.activeProjectName, {
             filePaths: selFilePaths,
             removedTagsIds: tagsIds,
         });
@@ -87,7 +85,7 @@ export class GlobalUtils {
     // }
 
     async generateFilesPosters(filePaths: string[]) {
-        await this.store.api.files.generateFilesPosters(this.activeProjectName, {
+        await this.store.api.files.generateFilesPosters(this.store.activeProjectName, {
             filePaths
         });
     }

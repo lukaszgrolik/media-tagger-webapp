@@ -11,6 +11,7 @@ import { Config, ConfigBody } from "./tab-config";
 
 export type TabCreateBody = {
     readonly id: number;
+    readonly projectName: string;
 } & TabUpdateBody;
 
 export type TabUpdateBody = {
@@ -24,6 +25,7 @@ export type TabUpdateBody = {
 
 export class Tab {
     readonly id: number;
+    readonly projectName: string;
     readonly config: Config;
     readonly filtering: Filtering;
     readonly sorting: Sorting;
@@ -34,6 +36,7 @@ export class Tab {
 
     constructor(readonly store: Store, body: TabCreateBody) {
         this.id = body.id;
+        this.projectName = body.projectName;
         this.config = new Config(this.store, body.config);
         this.filtering = new Filtering(this.store, body.filtering);
         this.sorting = new Sorting(this.store, this, body.sorting);
