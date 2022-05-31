@@ -4,6 +4,7 @@ import { FilePath } from "../file-path";
 import { Store } from "../store";
 import { TagID } from "../tag";
 import { Filtering, FilteringBody } from "./filtering";
+import { Grouping, GroupingBody } from "./grouping";
 import { Pagination, PaginationBody } from "./pagination";
 import { Sorting, SortingBody } from "./sorting";
 import { Config, ConfigBody } from "./tab-config";
@@ -17,6 +18,7 @@ export type TabUpdateBody = {
     readonly filtering?: FilteringBody;
     readonly sorting?: SortingBody;
     readonly pagination?: PaginationBody;
+    readonly grouping?: GroupingBody;
     readonly selectedFilePaths?: string[];
 }
 
@@ -26,6 +28,7 @@ export class Tab {
     readonly filtering: Filtering;
     readonly sorting: Sorting;
     readonly pagination: Pagination;
+    readonly grouping: Grouping;
 
     readonly selectedFilePaths: FilePath[];
 
@@ -35,6 +38,7 @@ export class Tab {
         this.filtering = new Filtering(this.store, body.filtering);
         this.sorting = new Sorting(this.store, this, body.sorting);
         this.pagination = new Pagination(this.store, this, body.pagination);
+        this.grouping = new Grouping(this.store, this, body.grouping);
 
         this.selectedFilePaths = (body.selectedFilePaths || []).map(sfp => {
             // return store.filePaths.find(fp => fp.path === sfp);
