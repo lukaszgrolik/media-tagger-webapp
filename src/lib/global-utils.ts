@@ -88,6 +88,27 @@ export class GlobalUtils {
         await this.store.api.files.generateFilesPosters(this.store.activeProjectName, {
             filePaths
         });
+
+        const fetchStatus = async () => {
+            return this.store.api.files.fetchFilesPostersStatus(this.store.activeProjectName);
+        };
+        const loop = () => {
+            setTimeout(async () => {
+                const status = await fetchStatus();
+
+                if (status.jobs.length === 0) {
+                    console.log('all jobs finished');
+                }
+                else {
+                    const jobsProgressText = status.jobs.map(job => `job #${job.id} progress: ${Math.round(job.progress.progress * 100)}%`).join(' | ');
+                    console.log(new Date().toISOString(), jobsProgressText);
+
+                    loop();
+                }
+            }, 1000);
+        };
+
+        loop();
     }
 
     getVideosWithoutPosters() {

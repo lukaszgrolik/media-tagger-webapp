@@ -17,6 +17,25 @@ type UpdateFilesTagsBody = {
     newTags?: (string | { name: string; parentId: TagID })[]
 };
 
+type FilesPostersResBody = {
+    jobs: {
+        id: number;
+        progress: {
+            count: number;
+            progress: number;
+            date: string;
+        };
+        failed: {
+            path: string;
+            error: string;
+        }[];
+        succeeded: {
+            src: string;
+            dest: string;
+        }[];
+    }[];
+};
+
 type GenerateFilesPostersBody = {
     filePaths: string[];
 };
@@ -67,5 +86,19 @@ export class ApiFiles {
         const data = await res.json();
 
         this.api.opts.onResponse(data);
+    }
+
+    async fetchFilesPostersStatus(projectName: string): Promise<FilesPostersResBody> {
+        const res = await fetch(`${this.api.API_BASE_URL}/${projectName}/files/posters/status`, {
+            method: 'get',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+        const data: FilesPostersResBody = await res.json();
+
+        return data;
+
+        // this.api.opts.onResponse(data);
     }
 }
