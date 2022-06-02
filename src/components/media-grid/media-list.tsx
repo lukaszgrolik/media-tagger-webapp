@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 
 export const MediaList = styled.ul<{width: number; height: number}>`
     margin: 0;
-    padding: 0;
+    padding: 2em;
 
     /* display: grid; */
     /* grid-template-columns: ${(props) => `repeat(3, ${props.width}px)`}; */

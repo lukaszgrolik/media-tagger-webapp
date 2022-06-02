@@ -18,7 +18,7 @@ const Wrapper = styled.div`
     background: ${repLinGradient(-45, '#f7f7f7', '#eee', `1em`, `5em`)};
     grid-area: main-content;
     overflow: auto;
-    padding: 2em;
+    /* padding: 2em; */
 `;
 
 export const MediaGrid: React.FC<{ store: Store.Store; projectName: string; }> = observer(({store, projectName}) => {
