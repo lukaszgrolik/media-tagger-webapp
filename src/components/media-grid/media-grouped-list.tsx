@@ -62,11 +62,15 @@ export const MediaGroupedList: React.FC<{ store: Store.Store; projectName: strin
     if (!tab) return null;
 
     const groups = tab.pagination.filePaths.reduce((memo: { date: DateTime | null, filePaths: FilePath[] }[], fp) => {
-        let dateFound = memo.find(day => (!day.date || !fp.mtimeDate) ? false : groupFound(tab.grouping.mode, day.date, fp.mtimeDate));
+        let dateFound = memo.find(day => {
+            if (!day.date || !fp.file || !fp.file.mtimeDate) return false;
+
+            return groupFound(tab.grouping.mode, day.date, fp.file.mtimeDate);
+        });
 
         if (!dateFound) {
             dateFound = {
-                date: fp.mtimeDate,
+                date: fp.file?.mtimeDate || null,
                 filePaths: [],
             };
 

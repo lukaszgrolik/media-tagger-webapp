@@ -40,6 +40,10 @@ type GenerateFilesPostersBody = {
     filePaths: string[];
 };
 
+type FetchFilesMetaStatBody = {
+    filePaths: string[];
+};
+
 export class ApiFiles {
     constructor(readonly api: API) {
 
@@ -83,9 +87,9 @@ export class ApiFiles {
             },
             body: JSON.stringify(body),
         });
-        const data = await res.json();
+        // const data = await res.json();
 
-        this.api.opts.onResponse(data);
+        // this.api.opts.onResponse(data);
     }
 
     async fetchFilesPostersStatus(projectName: string): Promise<FilesPostersResBody> {
@@ -98,6 +102,19 @@ export class ApiFiles {
         const data: FilesPostersResBody = await res.json();
 
         return data;
+
+        // this.api.opts.onResponse(data);
+    }
+
+    async fetchFilesMetaStat(projectName: string, body: FetchFilesMetaStatBody) {
+        const res = await fetch(`${this.api.API_BASE_URL}/${projectName}/files/meta/stat`, {
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body),
+        });
+        // const data = await res.json();
 
         // this.api.opts.onResponse(data);
     }

@@ -54,7 +54,7 @@ export const MediaItem: React.FC<{ store: Store.Store; projectName: string; file
                     tab.toggleFilePath(filePath);
                 }}
             >
-                <div title={filePath.mtimeDate.toFormat('yyyy-MM-dd HH:mm')}>
+                <div title={filePath.file?.mtimeDate?.toFormat('yyyy-MM-dd HH:mm')}>
                     {
                         filePath.fileType === 'video'
                             ?
@@ -88,17 +88,21 @@ export const MediaItem: React.FC<{ store: Store.Store; projectName: string; file
                                 </div>
                     }
                 </div>
+
                 <div style={{ position: 'absolute', left: 0, bottom: 0, backgroundColor: 'rgba(255, 255, 255, .75)', fontSize: 14 }}>
                     <a href={assetUrl} title={filePath.path}>link</a>
                 </div>
+
                 <div style={{ position: 'absolute', right: 0, bottom: 0, backgroundColor: 'rgba(255, 255, 255, .75)', fontSize: 14 }}>
-                    {filePath.sizeString}
+                    {filePath.file?.fileSizeString}
                 </div>
+
                 {
                     filePath.file
                     &&
                     <div style={{ position: 'absolute', left: 0, top: 0, backgroundColor: 'rgba(255, 255, 255, .75)', fontSize: 14 }}>#{filePath.file.id}</div>
                 }
+
                 {
                     filePath.file?.tags.length
                     &&

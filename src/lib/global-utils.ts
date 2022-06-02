@@ -123,4 +123,21 @@ export class GlobalUtils {
 
         await this.generateFilesPosters(filePaths);
     }
+
+    getFilesWithoutMetaStat() {
+        return this.store.filePaths.filter(fp => {
+            return !fp.file || !fp.file.meta.mtime || !fp.file.meta.fileSize;
+        });
+    }
+
+    async fetchMetaStatForFilesWithoutMetaStat(max: number) {
+        const files = this.getFilesWithoutMetaStat();
+        const filePaths = files.map(fp => fp.path).slice(0, max);
+
+        await this.store.api.files.fetchFilesMetaStat(this.store.activeProjectName, {
+            filePaths
+        });
+
+        console.log('done');
+    }
 }

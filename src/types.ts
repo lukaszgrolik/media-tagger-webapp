@@ -40,7 +40,7 @@ type Filtering = {
     withoutTagsIds?: TagID[];
 };
 
-type SortingField = 'path' | 'mtime' | 'size';
+type SortingField = 'path' | 'mtime' | 'fileSize';
 type Sorting = {
     field?: SortingField;
     asc?: boolean;

@@ -39,9 +39,9 @@ export const SortingBlock: React.FC<{ store: Store.Store }> = observer(({ store 
             >mtime</Button>
 
             <Button
-                isActive={tab.sorting.field === 'size'}
+                isActive={tab.sorting.field === 'fileSize'}
                 onClick={() => {
-                    tab.sorting.setSorting('size', tab.sorting.asc);
+                    tab.sorting.setSorting('fileSize', tab.sorting.asc);
                 }}
             >size</Button>
 

@@ -1,4 +1,6 @@
+import { DateTime } from "luxon";
 import { action, computed, makeObservable, observable } from "mobx";
+import { humanFileSize } from "../lib/utils";
 
 import { Store } from "./store";
 import { Tag, TagID } from "./tag";
@@ -11,6 +13,8 @@ export interface FileCreateBody {
     readonly description: string;
     readonly tagsIds: TagID[];
     readonly meta?: {
+        mtime?: string;
+        fileSize: number;
         poster?: string;
     };
 }
@@ -25,7 +29,11 @@ export class File {
     path: string;
     description: string;
     readonly tagsIds: number[] = [];
-    readonly meta: {poster: string | null | undefined};
+    readonly meta: {
+        mtime: string | undefined;
+        fileSize: number | undefined;
+        poster: string | null | undefined;
+    };
 
     constructor(readonly store: Store, body: FileCreateBody) {
         this.id = body.id;
@@ -33,6 +41,8 @@ export class File {
         this.description = body.description || '';
         this.tagsIds = body.tagsIds;
         this.meta = {
+            mtime: body.meta?.mtime,
+            fileSize: body.meta?.fileSize,
             poster: body.meta?.poster,
         };
 
@@ -47,6 +57,8 @@ export class File {
             setTags: action,
 
             meta: observable,
+            mtimeDate: computed,
+            fileSizeString: computed,
 
             update: action,
         });
@@ -72,5 +84,15 @@ export class File {
             // return this.store.tags.find(t => t.id === tagId);
             return this.store.tags_indexedBy_id.get(tagId);
         }).filter(t => t) as Tag[];
+    }
+
+    get mtimeDate() {
+        return this.meta.mtime ? DateTime.fromISO(this.meta.mtime) : undefined;
+    }
+
+    get fileSizeString() {
+        if (!this.meta.fileSize) return 0;
+
+        return humanFileSize(this.meta.fileSize, true);
     }
 }

@@ -5,11 +5,6 @@ import { Store } from "./store";
 
 export interface FilePathBody {
     readonly path: string;
-    readonly ctime: string;
-    readonly mtime: string;
-    readonly size: number;
-    readonly width: number;
-    readonly height: number;
 }
 
 export class FilePath {
@@ -18,13 +13,6 @@ export class FilePath {
     readonly fileName: string;
     readonly fileExtRaw: string;
     readonly fileExt: string;
-
-    readonly ctime: string;
-    readonly mtime: string;
-    readonly mtimeDate: DateTime;
-    readonly size: number;
-    readonly width: number;
-    readonly height: number;
 
     readonly fileType: 'image' | 'video';
     readonly mediaType: 'static' | 'animated';
@@ -44,13 +32,6 @@ export class FilePath {
         this.fileExtRaw = _fileExt;
         this.fileExt = _fileExt.toLowerCase();
         if (this.fileExt === 'jpeg') this.fileExt = 'jpg';
-
-        this.ctime = body.ctime;
-        this.mtime = body.mtime;
-        this.mtimeDate = DateTime.fromISO(body.mtime);
-        this.size = body.size;
-        this.width = body.width;
-        this.height = body.height;
 
         this.fileType = (() => {
             if (['jpg', 'png', 'gif', 'svg', 'webp'].includes(this.fileExt)) return 'image';
@@ -72,19 +53,5 @@ export class FilePath {
     get file() {
         // return this.store.files.find(f => f.path === this.path);
         return this.store.files_indexedBy_path.get(this.path);
-    }
-
-    get sizeString() {
-        const mb = this.size / (2 ** 10) ** 2;
-        const mbInt = Math.round(mb);
-
-        const val = (() => {
-            if (mbInt.toString().length < 2)
-                return mb.toFixed(1);
-            else
-                return mbInt;
-        })();
-
-        return `${val} MB`;
     }
 }
