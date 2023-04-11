@@ -1,5 +1,7 @@
 import { UpdateFilesBody } from "../store/api/api-files";
-import { Store } from "../store/store";
+import { Store, FilePath } from "../store/store";
+import { ArrayMap } from "./array-map";
+import { humanFileSize } from "./utils";
 
 export class GlobalUtils {
     constructor(readonly store: Store) {
@@ -140,4 +142,49 @@ export class GlobalUtils {
 
         console.log('done');
     }
+
+    getPossibleDuplicates() {
+        const processedFileNames = new ArrayMap<string, FilePath>();
+        // const processedFilePaths = new Map<FilePath, string>();
+        const duplicatedFileNames: string[] = [];
+
+        for (const fp of this.store.filePaths) {
+            const fileName = fp.fileName.toLowerCase().replace(/[-_]/, ' ');
+
+            const count = processedFileNames.addItem(fileName, fp);
+
+            if (count > 1 && duplicatedFileNames.includes(fileName) === false) {
+                duplicatedFileNames.push(fileName);
+            }
+        }
+
+        return processedFileNames.filterByKeys(duplicatedFileNames);
+    }
+
+    getEstimatedSizeSavedFromRemovingDuplicates() {
+        const duplicates = this.getPossibleDuplicates();
+        const byExtension: {[key: string]: number} = {};
+        let total = 0;
+
+        for (const [fileName, fp] of duplicates) {
+            const filesToDelete = fp.slice(1);
+
+            for (const filePath of filesToDelete) {
+                if (!byExtension[filePath.fileExt]) byExtension[filePath.fileExt] = 0;
+
+                const size = filePath.file?.meta.fileSize || 0;
+                byExtension[filePath.fileExt] += size;
+                total += size;
+            }
+        }
+
+        const byExtensionStr: {[key: string]: string} = {};
+        for (const ext in byExtension) {
+            const size = byExtension[ext];
+            byExtensionStr[ext] = humanFileSize(size);
+        }
+
+        return { total: humanFileSize(total), byExtension: byExtensionStr };
+    }
 }
+

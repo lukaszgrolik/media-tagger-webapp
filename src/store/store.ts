@@ -8,6 +8,7 @@ import { FilePath, FilePathBody } from "./file-path";
 import { Adapters } from "../lib/json-db/json-db";
 import { JsonDBInstance } from "../types";
 
+export * from './file-path';
 export * from './tag';
 export * from './file';
 

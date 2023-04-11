@@ -23,14 +23,14 @@ export class FilePath {
         const fileM = body.path.match(/^(.+)?\/(.+)\.([^\.]+)$/);
         // if (!fileM) return;
 
-        const [_, dir, fileName, _fileExt] = fileM as RegExpMatchArray;
-        // console.log(dir, fileName, _fileExt)
+        const [_, dir, fileName, fileExt] = fileM as RegExpMatchArray;
+        // console.log(dir, fileName, fileExt)
 
         this.dir = dir;
         this.fileName = fileName;
 
-        this.fileExtRaw = _fileExt;
-        this.fileExt = _fileExt.toLowerCase();
+        this.fileExtRaw = fileExt;
+        this.fileExt = fileExt.toLowerCase();
         if (this.fileExt === 'jpeg') this.fileExt = 'jpg';
 
         this.fileType = (() => {

@@ -9,6 +9,7 @@ type MediaType = 'static' | 'animated';
 export interface FilteringBody {
     readonly fileType?: FileType | null;
     readonly mediaType?: MediaType | null;
+    readonly fileName?: string;
     readonly untagged?: boolean;
     readonly tagsIds?: TagID[];
     readonly withoutTagsIds?: TagID[];
@@ -19,6 +20,7 @@ export class Filtering {
     mediaType: MediaType | null = null;
     // minDate: string | null = null;
     // maxDate: string | null = null;
+    fileName: string = '';
     untagged = false;
     readonly tagsIds: TagID[] = [];
     readonly withoutTagsIds: TagID[] = [];
@@ -27,6 +29,7 @@ export class Filtering {
     constructor(readonly store: Store, body: FilteringBody = {}) {
         if (body.fileType !== undefined) this.fileType = body.fileType;
         if (body.mediaType !== undefined) this.mediaType = body.mediaType;
+        if (body.fileName !== undefined) this.fileName = body.fileName;
         if (body.untagged !== undefined) this.untagged = body.untagged;
         if (body.tagsIds !== undefined) this.tagsIds = body.tagsIds;
         if (body.withoutTagsIds !== undefined) this.withoutTagsIds = body.withoutTagsIds;
@@ -39,6 +42,9 @@ export class Filtering {
 
             mediaType: observable,
             setMediaType: action,
+
+            fileName: observable,
+            setFileName: action,
 
             untagged: observable,
             setUntagged: action,
@@ -60,6 +66,7 @@ export class Filtering {
             return {
                 fileType: this.fileType,
                 mediaType: this.mediaType,
+                fileName: this.fileName,
                 untagged: this.untagged,
                 tagsIds: this.tagsIds.slice(),
                 withoutTagsIds: this.withoutTagsIds.slice(),
@@ -76,6 +83,7 @@ export class Filtering {
     reset() {
         this.fileType = null;
         this.mediaType = null;
+        this.fileName = '';
         this.untagged = false;
         this.tagsIds.length = 0;
         this.withoutTagsIds.length = 0;
@@ -87,6 +95,10 @@ export class Filtering {
 
     setMediaType(value: MediaType | null) {
         this.mediaType = value;
+    }
+
+    setFileName(value: string) {
+        this.fileName = value;
     }
 
     setUntagged(val: boolean) {
@@ -129,6 +141,7 @@ export class Filtering {
         if (
             this.fileType === null &&
             this.mediaType === null &&
+            this.fileName.trim() === '' &&
             this.untagged === false &&
             this.tagsIds.length === 0 &&
             this.withoutTagsIds.length === 0
@@ -143,6 +156,13 @@ export class Filtering {
 
             if (this.mediaType) {
                 if (filePath.mediaType !== this.mediaType) return false;
+            }
+
+            const fileNameSanitized = this.fileName.trim();
+            if (fileNameSanitized !== '') {
+                const matches = filePath.fileName.toLowerCase().includes(fileNameSanitized.toLowerCase());
+
+                if (!matches) return false;
             }
 
             if (this.untagged) {

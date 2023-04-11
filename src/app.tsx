@@ -49,6 +49,10 @@ const app = (
                 <MainView store={store} />
             </Route>
 
+            <Route path="/*">
+                <p>Route not found</p>
+            </Route>
+
             {/* {
                 pages.map(page => {
                     return (

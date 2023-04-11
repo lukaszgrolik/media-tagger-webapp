@@ -23,6 +23,18 @@ export const FiltersBlock: React.FC<{ store: Store.Store }> = observer(({ store 
         <Wrapper>
             <div>filtered files: {tab.filtering.filePaths.length} ({store.filePaths.length} total)</div>
 
+            <div>
+                <span>search by file name:</span>
+                {/* {tab.filtering.tags.map(tag => tag.name).join(', ') || '-'} */}
+                <input
+                    type="text"
+                    value={tab.filtering.fileName}
+                    onChange={e => {
+                        tab.filtering.setFileName(e.currentTarget.value);
+                    }}
+                />
+            </div>
+
             <label style={{ display: 'flex', alignItems: 'center', gap: '.5em', padding: '.5em' }}>
                 <input
                     type="checkbox"
