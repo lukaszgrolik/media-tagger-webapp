@@ -101,7 +101,13 @@ async function loadLocalStorageData(store: Store.Store, projectName: string) {
 
 export const MainView: React.FC<{store: Store.Store}> = observer(({store}) => {
     const [loaded, setLoaded] = React.useState(false);
-    const {projectName} = useParams<{projectName: string}>();
+    const {projectName} = useParams();
+
+    if (!projectName) {
+        return (
+            <p>Project is undefined</p>
+        );
+    }
 
     React.useEffect(() => {
         document.title = `media-tagger | ${projectName}`;

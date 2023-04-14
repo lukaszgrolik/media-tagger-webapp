@@ -1,6 +1,6 @@
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import { BrowserRouter, Link, NavLink, Route, Switch } from 'react-router-dom';
+import * as ReactDOM from 'react-dom/client';
+import { BrowserRouter, Link, NavLink, Route, Routes } from 'react-router-dom';
 
 import * as Store from './store/store';
 import { GlobalUtils } from './lib/global-utils';
@@ -44,14 +44,9 @@ const app = (
             <NavLink activeStyle={{ fontWeight: 'bold' }} to="/training">Training</NavLink>
         </ul> */}
 
-        <Switch>
-            <Route path="/projects/:projectName">
-                <MainView store={store} />
-            </Route>
-
-            <Route path="/*">
-                <p>Route not found</p>
-            </Route>
+        <Routes>
+            <Route path="/projects/:projectName" element={<MainView store={store} />} />
+            <Route path="/*" element={<p>Route not found</p>} />
 
             {/* {
                 pages.map(page => {
@@ -62,8 +57,10 @@ const app = (
                     )
                 })
             } */}
-        </Switch>
+        </Routes>
     </BrowserRouter>
 );
 
-ReactDOM.render(app, document.getElementById('react-root'));
+const root = ReactDOM.createRoot(document.getElementById('react-root') as HTMLElement);
+
+root.render(app);
