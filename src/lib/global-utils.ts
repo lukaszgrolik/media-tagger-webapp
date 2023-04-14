@@ -86,31 +86,37 @@ export class GlobalUtils {
 
     // }
 
+    async fetchJobs() {
+        const data = await this.store.api.jobs.fetchJobs(this.store.activeProjectName);
+
+        return data;
+    }
+
     async generateFilesPosters(filePaths: string[]) {
         await this.store.api.files.generateFilesPosters(this.store.activeProjectName, {
             filePaths
         });
 
-        const fetchStatus = async () => {
-            return this.store.api.files.fetchFilesPostersStatus(this.store.activeProjectName);
-        };
-        const loop = () => {
-            setTimeout(async () => {
-                const status = await fetchStatus();
+        // const fetchStatus = async () => {
+        //     return this.store.api.files.fetchFilesPostersStatus(this.store.activeProjectName);
+        // };
+        // const loop = () => {
+        //     setTimeout(async () => {
+        //         const status = await fetchStatus();
 
-                if (status.jobs.length === 0) {
-                    console.log('all jobs finished');
-                }
-                else {
-                    const jobsProgressText = status.jobs.map(job => `job #${job.id} progress: ${Math.round(job.progress.progress * 100)}%`).join(' | ');
-                    console.log(new Date().toISOString(), jobsProgressText);
+        //         if (status.jobs.length === 0) {
+        //             console.log('all jobs finished');
+        //         }
+        //         else {
+        //             const jobsProgressText = status.jobs.map(job => `job #${job.id} progress: ${Math.round(job.progress.progress * 100)}%`).join(' | ');
+        //             console.log(new Date().toISOString(), jobsProgressText);
 
-                    loop();
-                }
-            }, 1000);
-        };
+        //             loop();
+        //         }
+        //     }, 1000);
+        // };
 
-        loop();
+        // loop();
     }
 
     getVideosWithoutPosters() {
@@ -119,11 +125,37 @@ export class GlobalUtils {
         });
     }
 
-    async generatePostersForVideosWithoutPosters(max: number) {
+    async generateMissingVideosPosters(max: number) {
         const files = this.getVideosWithoutPosters();
         const filePaths = files.map(fp => fp.path).slice(0, max);
 
         await this.generateFilesPosters(filePaths);
+    }
+
+    // @todo arg sizes
+    getImagesWithoutThumbnails() {
+        return this.store.filePaths.filter(fp => {
+            if (['jpg', 'png'].includes(fp.fileExt)) {
+                const thumbObj = fp.file?.meta?.thumbnails;
+
+                return !thumbObj || Object.keys(thumbObj).length === 0;
+            }
+            else {
+                return false
+            }
+        });
+    }
+
+    // @todo arg sizes
+    async generateMissingImageThumbnails(max: number) {
+        const files = this.getImagesWithoutThumbnails();
+        const filePaths = files.map(fp => fp.path).slice(0, max);
+
+        await this.store.api.files.generateImageThumbnails(this.store.activeProjectName, {
+            filePaths,
+            // @todo hardcoded
+            sizes: [100, 400]
+        });
     }
 
     getFilesWithoutMetaStat() {

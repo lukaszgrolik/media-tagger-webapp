@@ -16,6 +16,7 @@ export interface FileCreateBody {
         mtime?: string;
         fileSize: number;
         poster?: string;
+        thumbnails?: {[height: string]: string};
     };
 }
 
@@ -33,6 +34,7 @@ export class File {
         mtime: string | undefined;
         fileSize: number | undefined;
         poster: string | null | undefined;
+        thumbnails: {[height: string]: string} | null | undefined;
     };
 
     constructor(readonly store: Store, body: FileCreateBody) {
@@ -44,6 +46,7 @@ export class File {
             mtime: body.meta?.mtime,
             fileSize: body.meta?.fileSize,
             poster: body.meta?.poster,
+            thumbnails: body.meta?.thumbnails,
         };
 
         makeObservable(this, {

@@ -17,27 +17,13 @@ type UpdateFilesTagsBody = {
     newTags?: (string | { name: string; parentId: TagID })[]
 };
 
-type FilesPostersResBody = {
-    jobs: {
-        id: number;
-        progress: {
-            count: number;
-            progress: number;
-            date: string;
-        };
-        failed: {
-            path: string;
-            error: string;
-        }[];
-        succeeded: {
-            src: string;
-            dest: string;
-        }[];
-    }[];
-};
-
 type GenerateFilesPostersBody = {
     filePaths: string[];
+};
+
+type GenerateImageThumbnailsBody = {
+    filePaths: string[];
+    sizes: number[];
 };
 
 type FetchFilesMetaStatBody = {
@@ -92,16 +78,15 @@ export class ApiFiles {
         // this.api.opts.onResponse(data);
     }
 
-    async fetchFilesPostersStatus(projectName: string): Promise<FilesPostersResBody> {
-        const res = await fetch(`${this.api.API_BASE_URL}/${projectName}/files/posters/status`, {
-            method: 'get',
+    async generateImageThumbnails(projectName: string, body: GenerateImageThumbnailsBody) {
+        const res = await fetch(`${this.api.API_BASE_URL}/${projectName}/files/thumbnails/generate`, {
+            method: 'post',
             headers: {
                 'Content-Type': 'application/json'
             },
+            body: JSON.stringify(body),
         });
-        const data: FilesPostersResBody = await res.json();
-
-        return data;
+        // const data = await res.json();
 
         // this.api.opts.onResponse(data);
     }

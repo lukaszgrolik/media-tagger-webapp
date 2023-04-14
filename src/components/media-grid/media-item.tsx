@@ -19,20 +19,26 @@ export const MediaItem: React.FC<{ store: Store.Store; projectName: string; file
 
     const assetUrl = store.api.getProjectFileUrl(projectName, filePath.path);
     const thumbnailUrl = (() => {
-        const thumbSizes = [90, 180, 360, 720];
+        if (['jpg', 'png'].includes(filePath.fileExt) === false) {
+            return assetUrl;
+        }
+
+        const thumbnails = filePath.file?.meta.thumbnails;
+        if (!thumbnails || Object.keys(thumbnails).length === 0) return assetUrl;
+
+        // const thumbSizes = [90, 180, 360, 720];
+        // const thumbSizes = [100, 400];
+        const thumbSizes = Object.keys(thumbnails).map(s => parseInt(s));
         const { fileHeight } = tab.config;
 
-        if (filePath.fileExt === 'gif') {
+        if (fileHeight > thumbSizes[thumbSizes.length - 1]) {
             return assetUrl;
         }
-        else if (fileHeight > thumbSizes[thumbSizes.length - 1]) {
-            return assetUrl;
-        }
-        else {
-            const thumbSize = thumbSizes.find(s => s >= fileHeight) as number;
 
-            return store.api.getProjectFileThumbnailUrl(projectName, filePath.path, thumbSize);
-        }
+        const thumbSize = thumbSizes.find(s => s >= fileHeight) as number;
+
+        // return store.api.getProjectFileThumbnailUrl(projectName, filePath.path, thumbSize);
+        return store.api.getProjectFileThumbnailUrl(projectName, thumbnails[thumbSize])
     })();
     const posterUrl = (() => {
         if (!filePath.file || !filePath.file.meta.poster) return;
@@ -74,7 +80,8 @@ export const MediaItem: React.FC<{ store: Store.Store; projectName: string; file
                                 ?
                                 <img
                                     // src={thumbnailUrl}
-                                    src={assetUrl}
+                                    // src={assetUrl}
+                                    src={thumbnailUrl}
                                     alt={filePath.path}
                                     // width={tab.config.fileWidth}
                                     height={tab.config.fileHeight}
@@ -84,7 +91,7 @@ export const MediaItem: React.FC<{ store: Store.Store; projectName: string; file
                                 :
                                 <div>
                                     <div>{assetUrl}</div>
-                                    <div>unsupported file extension:  {filePath.fileExt}</div>
+                                    <div>unsupported file extension: {filePath.fileExt}</div>
                                 </div>
                     }
                 </div>

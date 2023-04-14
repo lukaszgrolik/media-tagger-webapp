@@ -1,3 +1,4 @@
+import { ApiJobs } from "./api-jobs";
 import { ApiFiles } from "./api-files";
 import { ApiTags } from "./api-tags";
 
@@ -29,6 +30,7 @@ type ApiOpts = {
 export class API {
     readonly API_BASE_URL = 'http://localhost:3060';
 
+    readonly jobs = new ApiJobs(this);
     readonly tags = new ApiTags(this);
     readonly files = new ApiFiles(this);
 
@@ -56,12 +58,15 @@ export class API {
         return `${this.getProjectPostersUrl(projectName)}${posterPath}`;
     }
 
-    getProjectFileThumbnailUrl(projectName: string, filePath: string, size: number) {
-        const m = filePath.match(/([^\.]+)(\..+)$/);
-        if (!m) throw new Error(`invalid filePath: ${filePath}`);
+    // getProjectFileThumbnailUrl(projectName: string, filePath: string, size: number) {
+    getProjectFileThumbnailUrl(projectName: string, thumbnailFilePath: string) {
+        // const m = filePath.match(/([^\.]+)(\..+)$/);
+        // if (!m) throw new Error(`invalid filePath: ${filePath}`);
 
-        const [_, basePath, ext] = m;
-        const thumbnailFilePath = `${basePath}_${size}${ext}`;
+        // const [_, basePath, ext] = m;
+        // const thumbnailFilePath = `${basePath}_${size}${ext}`;
+
+        // return `${this.getProjectThumbnailsUrl(projectName)}${thumbnailFilePath}`;
 
         return `${this.getProjectThumbnailsUrl(projectName)}${thumbnailFilePath}`;
     }
