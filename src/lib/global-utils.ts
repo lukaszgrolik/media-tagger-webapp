@@ -8,6 +8,28 @@ export class GlobalUtils {
 
     }
 
+    sample(count: number = 10): string[] {
+        if (!this.store.activeTab) return [];
+
+        const filePaths = this.store.activeTab.sorting.filePaths;
+
+        const indices = new Array(count).fill(null).map(() => {
+            const index = Math.floor(Math.random() * filePaths.length);
+
+            return index;
+        });
+
+        return indices.map(i => {
+            const assetUrl = this.store.api.getProjectFileUrl(this.store.activeProjectName, filePaths[i].path);
+
+            return assetUrl;
+        });
+    }
+
+    sampleStr(count: number = 10): string {
+        return this.sample(count).join('\n');
+    }
+
     getSelectedFiles(): string[] {
         if (!this.store.activeTab) return [];
 
